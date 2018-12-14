@@ -1,4 +1,3 @@
-# deploy-cap-aks-cluster
 Scripts to deploy and manage CAP ready Azure AKS clusters (using azure-cli, az).
 These scripts are for internal use, as they rely on some fixed presets.
 
@@ -25,7 +24,7 @@ Tested with the following versions:
 
 The scripts take configuration files. "example.conf" is the default one, which is used if no configuration file is given.
 You need to modify "example.conf" for your needs, while I recommend to just copy it to e.g. "myaks.conf" and modify that
-``bash
+```bash
 $ <script> -c myaks.conf
 ```
 This way you can save configurations and even manage various different test and demo clusters.
@@ -44,6 +43,11 @@ It also creates a directory (e.g. "CAP-AKS-2018-12-14_10h48_test1") for each dep
 * a log file for that deployment
 * the kubeconfig file for your AKS cluster
 * a preconfigured scf-config-values.yaml for your CAP deployment
+
+E.g. run
+```bash
+./deploy-cap-aks-cluster.sh -c test1.conf
+```
 
 
 # Deploying CAP on top
@@ -67,16 +71,15 @@ For details see the documentation on how to [Deploy with Helm](https://www.suse.
 Once everything is set up, you can use "stop_cap_aks_cluster.sh" and "start_cap_aks_cluster.sh" to save time and costs.
 Start/stop scripts will only make use of the AKS resource group name in your configuration, and find the related VMs for you.
 So it's also possible to use the commands for an existing resource group, by just providing a suitable config file.
-```bash
-stop_cap_aks_cluster.sh -c test1.conf` or `start_cap_aks_cluster.sh -c test1.conf
-```
+
+`./stop_cap_aks_cluster.sh -c test1.conf` or `./start_cap_aks_cluster.sh -c test1.conf`
 
 
 # Delete AKS clusters
 
 Not much to say - this will delete the AKS resource group specified, e.g.
 ```bash
-delete_cap_aks_cluster.sh -c test1.conf
+./delete_cap_aks_cluster.sh -c test1.conf
 ```
 You'll have to confirm that request with "y", or cancel with "n".
 
@@ -86,9 +89,12 @@ You'll have to confirm that request with "y", or cancel with "n".
 ## Azure
 
 By default the configuration suggests option "azure". This will create and configure a load balancer within Azure (`az network lb create`).
+
 In the end this will give you a public IP, e.g. "40.101.3.25", which will be used for any request on AKS.
+
 The scripts then suggest and configure the domain e.g. "40.101.3.25.omg.howdoi.website" (similar to nip.io/xip.io).
 You would then use e.g. "https://40.101.3.25.omg.howdoi.website:8443" to access the Stratos UI.
+
 Depending on the number of ports you specified and network conditions the script will run approx. 35-45 min.
 
 Example output from `deploy-cap-aks-cluster.sh -c test1.conf`
@@ -122,7 +128,9 @@ Kubeconfig file is stored to: "CAP-AKS-2018-12-14_10h00_test1/kubeconfig"
 
 When configuring "kube", a kubernetes load balancer will assign various public IPs to specific roles. You need to set a subdomain in the configuration file,
 that will be used for the "susecap.net" domain. E.g. "test2" will configure and suggest the domain "test2.susecap.net".
+
 You will then use the e.g. `setup-*-dns.sh -c test1.conf` scripts to automatically create or update DNS entries for susecap.net based on the extracted IPs.
+
 Depending on network conditions the script will run approx. 20-30 min.
 
 Example output from `deploy-cap-aks-cluster.sh -c test2.conf`
