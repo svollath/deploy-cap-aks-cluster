@@ -1,0 +1,40 @@
+# This is a template file, not a working example
+
+secrets:
+  # Password for user 'admin' in the cluster
+  CLUSTER_ADMIN_PASSWORD: password
+
+  # Password for SCF to authenticate with UAA
+  UAA_ADMIN_CLIENT_SECRET: password
+
+env:
+  # Use the public IP address
+  DOMAIN: <domain>
+            
+  # uaa prefix is required
+  UAA_HOST: uaa.<domain>
+  UAA_PORT: 2793
+    
+  #Azure deployment requires overlay
+  GARDEN_ROOTFS_DRIVER: "overlay-xfs"
+    
+kube:
+  # List the private IP addresses
+  external_ips: <extip> 
+  storage_class:
+    # Azure supports only "default" or "managed-premium"
+    persistent: "default"
+    shared: "shared"
+    
+  registry:
+    hostname: "registry.suse.com"
+    username: ""
+    password: ""
+  organization: "cap"
+  auth: "rbac"
+  psp:
+    nonprivileged: "suse.cap.psp"
+    privileged: "suse.cap.psp"
+
+services:
+  loadbalanced: true
