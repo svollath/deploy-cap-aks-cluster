@@ -172,8 +172,8 @@ if [ "$mode" = "default" ]; then
    cat ./.scf-config-values.template | sed -e '/^# This/d' -e 's/<domain>/'$domain'/g' -e 's/<extip>/'"$extip"'/g' -e '/^services:/d' -e '/loadbalanced/d' > $deploymentid/scf-config-values.yaml
    echo -e " Public IP:\t\t\t\t${public_ip}\n \
 Private IPs (external_ips for CAP):\t$extip\n \
-Suggested DOMAIN for CAP: \t\t$domain\"\n\n \
-Values file wriiten to: $deploymentid/scf-config-values.yaml \n\n \
+Suggested DOMAIN for CAP: \t\t\"$domain\"\n\n \
+Values file written to: $deploymentid/scf-config-values.yaml \n\n \
 You need to:\n \
 Deploy UAA, SCF and Stratos (optionally)\n" | tee -a $logfile
 fi
@@ -183,7 +183,7 @@ if [ "$mode" = "loadbalanced" ]; then
    cat ./.scf-config-values.template | sed -e '/^# This/d' -e 's/<domain>/'$domain'/g' -e '/private IP/d' -e '/<extip>/d' > $deploymentid/scf-config-values.yaml
    echo -e " Suggested DOMAIN for CAP: \"$domain\"\n \
 Additional configuration: \"services.loadbalanced=\"true\"\"\n\n \
-Values file wriiten to: $deploymentid/scf-config-values.yaml \n\n \
+Values file written to: $deploymentid/scf-config-values.yaml \n\n \
 You need to:\n \
 1. Deploy UAA\n \
 2. Run \"setup-uaa-dns.sh -c $conffile\"\n \

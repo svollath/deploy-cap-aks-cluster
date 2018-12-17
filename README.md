@@ -39,7 +39,7 @@ In addition to deploy the AKS cluster, it does
 * create podsecuritypolicy "suse.cap.psp"
 * create clusterrole "suse:cap:psp" and clusterrolebinding "cap:clusterrole"
 
-It also creates a directory (e.g. "CAP-AKS-2018-12-14_10h48_test1") for each deployment with
+It also creates a directory (e.g. "CAP-AKS-2018-12-14_10h00_test1") for each deployment with
 * a log file for that deployment
 * the kubeconfig file for your AKS cluster
 * a preconfigured scf-config-values.yaml for your CAP deployment
@@ -60,19 +60,29 @@ export KUBECONFIG=./CAP-AKS-2018-12-14_10h48_test1/kubeconfig
 
 and start with e.g.
 ```bash
-helm install suse/uaa --name susecf-uaa --namespace uaa --values CAP-AKS-2018-12-14_10h48_test1/scf-config-values.yaml
+helm install suse/uaa --name susecf-uaa --namespace uaa --values CAP-AKS-2018-12-14_10h00_test1/scf-config-values.yaml
 ```
 
 For details see the documentation on how to [Deploy with Helm](https://www.suse.com/documentation/cloud-application-platform-1/book_cap_deployment/data/sec_cap_helm-deploy-prod.html).
 
 
-# Start/Stop AKS clusters
+# Manage AKS clusters
 
-Once everything is set up, you can use "stop_cap_aks_cluster.sh" and "start_cap_aks_cluster.sh" to save time and costs.
-Start/stop scripts will only make use of the AKS resource group name in your configuration, and find the related VMs for you.
-So it's also possible to use the commands for an existing resource group, by just providing a suitable config file.
+Once everything is set up, you can use "manage_cap_aks_cluster.sh" to save time and costs.
+The script will only make use of the AKS resource group name in your configuration, and find the related VMs for you.
+So it's also possible to use the command for an existing resource group, by just providing a suitable config file.
 
-`./stop_cap_aks_cluster.sh -c test1.conf` or `./start_cap_aks_cluster.sh -c test1.conf`
+`./manage_cap_aks_cluster.sh -c test1.conf [status|start|stop]`
+
+"status" will list the current power state of the VMs, while you can "start" and "stop" them, too.
+
+# Fetch kubeconfig of existing AKS cluster
+Like mentioned above, by just providing a suitable config file containing the respective Azure resource group, it's possible
+to get the kubeconfig file for an existing AKS cluster. This way you can manage it, or get access to Kubernetes as well.
+
+`fetch_new_kubeconfig.sh -c anew.conf`
+
+will create a directory and store the kubeconfig to it.
 
 
 # Delete AKS clusters
@@ -116,9 +126,9 @@ Kubeconfig file is stored to: "CAP-AKS-2018-12-14_10h00_test1/kubeconfig"
 
  Public IP:                             40.101.3.25
  Private IPs (external_ips for CAP):    ["10.240.0.4", "10.240.0.5", "10.240.0.6"]
- Suggested DOMAIN for CAP:              40.101.3.25.omg.howdoi.website"
+ Suggested DOMAIN for CAP:              "40.101.3.25.omg.howdoi.website"
 
- Values file wriiten to: CAP-AKS-2018-12-14_10h00_test1/scf-config-values.yaml 
+ Values file written to: CAP-AKS-2018-12-14_10h00_test1/scf-config-values.yaml 
 
  You need to:
  Deploy UAA, SCF and Stratos (optionally)
@@ -151,7 +161,7 @@ Kubeconfig file is stored to: "CAP-AKS-2018-12-14_14h22_test2/kubeconfig"
  Suggested DOMAIN for CAP: "test2.susecap.net"
  Additional configuration: "services.loadbalanced="true""
 
- Values file wriiten to: CAP-AKS-2018-12-14_14h22_test2/scf-config-values.yaml 
+ Values file written to: CAP-AKS-2018-12-14_14h22_test2/scf-config-values.yaml 
 
  You need to:
  1. Deploy UAA
