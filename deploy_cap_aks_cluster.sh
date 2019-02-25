@@ -51,6 +51,7 @@ esac
 deploymentid=CAP-AKS-`date +'%Y-%m-%d_%Hh%M'`_$(echo $conffile | cut -d "." -f1)
 logfile=$deploymentid/deployment.log
 mkdir $deploymentid
+export AKSDEPLOYID=$deploymentid
 echo -e "Deployment log: $deploymentid \n\nValues from $conffile:\n" > $logfile
 cat $conffile | sed -e 's/#.*$//' -e '/^$/d' >> $logfile
 
