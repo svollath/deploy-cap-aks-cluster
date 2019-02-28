@@ -6,7 +6,19 @@ These scripts are for internal use, as they rely on some fixed presets.
 * Get preconfigured scf-config-values.yaml files
 * Stop/start your clusters (VMs) by pointing to the config file
 * Delete clusters by pointing to the config file
-
+* > additions JML 280219 : 
+* >use the aks-cluster-config.conf file for your deployment (allows versioning of AZ objects while testing)
+* >Deploy CAP + OSBA & components & 1st mysql/rail Application through a menu driven approach.
+```bash
+1) Quit				   9) Create Azure SB		    17) AZ List Mysql DBs to Disable
+2) Review scfConfig		  10) Deploy OSBA		    18) AZ Disable SSL Mysql DBs
+3) Deploy UAA			  11) Pods OSBA			    19) Deploy 1st Rails Appl
+4) Pods UAA			  12) CF API set		    20) Deploy Stratos SCF Console
+5) Deploy SCF			  13) CF Add SB			    21) Pods Stratos
+6) Pods SCF			  14) CF CreateOrgSpace		    22) Deploy Metrics
+7) Deploy CATALOG		  15) CF 1st Service		    23) Pods Metrics
+8) Pods CATALOG			  16) CF 1st Service Status
+```
 
 # Prerequisites
 
@@ -24,8 +36,9 @@ Tested with the following versions:
 
 The scripts take configuration files. "example.conf" is the default one, which is used if no configuration file is given.
 You need to modify "example.conf" for your needs, while I recommend to just copy it to e.g. "myaks.conf" and modify that
+You may use the aks-cluster-config.conf as well if you have multiple attempts/versions in parallel.
 ```bash
-$ <script> -c myaks.conf
+$ <script> -c aks-cluster-config.conf
 ```
 This way you can save configurations and even manage various different test and demo clusters.
 
@@ -42,26 +55,72 @@ In addition to deploy the AKS cluster, it does
 It also creates a directory (e.g. "CAP-AKS-2018-12-14_10h00_test1") for each deployment with
 * a log file for that deployment
 * the kubeconfig file for your AKS cluster
-* a preconfigured scf-config-values.yaml for your CAP deployment
+* a preconfigured `scf-config-values.yaml` for your CAP deployment
 
 E.g. run
 ```bash
-./deploy-cap-aks-cluster.sh -c test1.conf
+./deploy-cap-aks-cluster.sh -c aks-cluster-config.conf
 ```
 
 
 # Deploying CAP on top
 
-deploy-cap-aks-cluster.sh leaves you with a rough guide on what to do next, in order to deploy CAP on the fresh AKS cluster.
-The first thing you'll need to is to use the kubeconfig with your current shell, by e.g.
+The cluster is ready and now the procedure to deploy the CAP 1.3 on it is following :
+* Copy the `init_aks_env.sh` example file containing the definition of ENVVARS required during the CAP deployment script.
 ```bash
-export KUBECONFIG=./CAP-AKS-2018-12-14_10h48_test1/kubeconfig
+cp init_aks_env.sh init_aks_env_my1.sh
+vim init_aks_env_my1.sh
 ```
+* Edit the `AKSDEPLOYID` value to match your deployment above.
+```bash
+export AKSDEPLOYID=CAP-AKS-2019-02-28_12h22_jmlcluster5
+export KUBECONFIG="$AKSDEPLOYID/kubeconfig"
+CFEP=$(awk '/Public IP:/{print "https://api." $NF ".xip.io"}' $AKSDEPLOYID/deployment.log)
+cf api --skip-ssl-validation $CFEP
+```
+* Save your file
+* initialise your ENVVARs by 
+```bash
+source init_aks_env.sh
+```
+* you may review/edit/modify the `scf-config-values.yaml` file that is generated in the `$AKSDEPLOYID/scf-config-values.yaml` 
 
-and start with e.g.
+Now you may launch the menu driven steps for deploying CAP on the cluster just deployed.
 ```bash
-helm install suse/uaa --name susecf-uaa --namespace uaa --values CAP-AKS-2018-12-14_10h00_test1/scf-config-values.yaml
+./deploy_cap_on_aks_by_step.sh
 ```
+* You will get the menu, then go step by step and check that the pods are running prior to engage the next step.(Automation will come soon)
+```bash
+1) Quit                            9) Create Azure SB               17) AZ List Mysql DBs to Disable
+2) Review scfConfig               10) Deploy OSBA                   18) AZ Disable SSL Mysql DBs
+3) Deploy UAA                     11) Pods OSBA                     19) Deploy 1st Rails Appl
+4) Pods UAA                       12) CF API set                    20) Deploy Stratos SCF Console
+5) Deploy SCF                     13) CF Add SB                     21) Pods Stratos
+6) Pods SCF                       14) CF CreateOrgSpace             22) Deploy Metrics
+7) Deploy CATALOG                 15) CF 1st Service                23) Pods Metrics
+8) Pods CATALOG                   16) CF 1st Service Status
+```
+* Review SCFConfig let you edit the `scf-config-values.yaml` again
+* Deploy for each elements is in the right order as there are some dependancies.
+* Pods XX will just let you watch the completion of pods deployements
+* The CF API is the config of your Cloudfoundry endpoint.
+* The Catalog/Azure ServiceBroker/OSBA are required to make dynamic provisionning of Azure Services (eg: DBs)
+* Point 17/18 are required to modify the SSL option of the deployed db.
+* 19 will deploy your 1st application from github, and make a Curl to check it.
+* 20 will deploy the CF dashboard (Stratos)
+* 21 will deploy the metrics (monitoring) that you will connect then to the stratos GUI.
+
+when you are there, you have done a great story, and you can start to play efficiently with SCF.
+* To Connect the Kubernetes API & the metrics API, go to the Stratos GUI, and in EndPoint, select the one.
+* for Kubernetes 
+* Endpoint : `https://jml-script-jml-cap-aks-5-rg-ef6fb0-14979a95.hcp.eastus.azmk8s.io:443`
+* CertAuth : provide your `kubeconfig` file (that resides in the same $AKSDEPLOYID subdir at `connect` time
+
+* For metrics :
+* Endpoint: `https://10.240.0.5:7443`
+* Username/Password : as provided in the `scf-config-values.yaml` 
+
+NB: If you have issues on the OSBA you may use the `svcat` tool to see if the service catalog & osba are well configured on the kubernetes side. 
 
 For details see the documentation on how to [Deploy with Helm](https://www.suse.com/documentation/cloud-application-platform-1/book_cap_deployment/data/sec_cap_helm-deploy-prod.html).
 
