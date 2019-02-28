@@ -37,6 +37,7 @@ if [ -e $conffile ]; then
    export AZ_AKS_NODE_VM_SIZE
    export AZ_SSH_KEY
    export AZ_ADMIN_USER
+   export AZ_ADMIN_PSW
   else
    echo -e "Error: Can't find config file: \"$conffile\""
    exit 1
@@ -51,7 +52,6 @@ esac
 deploymentid=CAP-AKS-`date +'%Y-%m-%d_%Hh%M'`_$(echo $conffile | cut -d "." -f1)
 logfile=$deploymentid/deployment.log
 mkdir $deploymentid
-export AKSDEPLOYID=$deploymentid
 echo -e "Deployment log: $deploymentid \n\nValues from $conffile:\n" > $logfile
 cat $conffile | sed -e 's/#.*$//' -e '/^$/d' >> $logfile
 
@@ -64,7 +64,8 @@ az aks create --resource-group $AZ_RG_NAME --name $AZ_AKS_NAME \
               --node-count $AZ_AKS_NODE_COUNT --admin-username $AZ_ADMIN_USER \
               --ssh-key-value $AZ_SSH_KEY --node-vm-size $AZ_AKS_NODE_VM_SIZE \
               --node-osdisk-size=60 --nodepool-name $AZ_AKS_NODE_POOL_NAME 2>&1>> $logfile
-
+export AZ_CLUSTER_FQDN=$(az aks list -g $AZ_RG_NAME|jq '.[].fqdn'|sed -e 's/"//g')
+echo -e "Cluster FQDN: $AZ_CLUSTER_FQDN"
 export AZ_MC_RG_NAME=$(az group list -o table | grep MC_"$AZ_RG_NAME"_ | awk '{print $1}')
 echo -e "Created AKS cluster: $AZ_AKS_NAME in $AZ_MC_RG_NAME"
 
@@ -124,7 +125,7 @@ if [ "$mode" = "default" ]; then
        --name probe-$i \
        --protocol tcp \
        --port $i 2>&1>> $logfile
-    
+
      az network lb rule create \
        --resource-group $AZ_MC_RG_NAME \
        --lb-name $AZ_AKS_NAME-lb \
@@ -169,8 +170,8 @@ if [ "$mode" = "default" ]; then
    internal_ips=($(az network nic list --resource-group $AZ_MC_RG_NAME | jq -r '.[].ipConfigurations[].privateIpAddress'))
    extip=\[\"$(echo "${internal_ips[*]}" | sed -e 's/ /", "/g')\"\]
    public_ip=$(az network public-ip show --resource-group $AZ_MC_RG_NAME --name $AZ_AKS_NAME-public-ip --query ipAddress --output tsv)
-   domain=${public_ip}.omg.howdoi.website
-   cat ./.scf-config-values.template | sed -e '/^# This/d' -e 's/<domain>/'$domain'/g' -e 's/<extip>/'"$extip"'/g' -e '/^services:/d' -e '/loadbalanced/d' > $deploymentid/scf-config-values.yaml
+   domain=${public_ip}.xip.io
+   cat ./.scf-config-values.template | sed -e '/^# This/d' -e 's/<domain>/'$domain'/g' -e 's/<extip>/'"$extip"'/g' -e '/^services:/d' -s 's/<fqdn>/'"$AZ_CLUSTER_FQDN"'/g' -e 's/<password>/'"$AZ_ADMIN_PSW"'/g' -e '/loadbalanced/d' > $deploymentid/scf-config-values.yaml
    echo -e " Public IP:\t\t\t\t${public_ip}\n \
 Private IPs (external_ips for CAP):\t$extip\n \
 Suggested DOMAIN for CAP: \t\t\"$domain\"\n\n \
