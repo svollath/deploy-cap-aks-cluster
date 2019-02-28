@@ -100,7 +100,9 @@ Now you may launch the menu driven steps for deploying CAP on the cluster just d
 7) Deploy CATALOG                 15) CF 1st Service                23) Pods Metrics
 8) Pods CATALOG                   16) CF 1st Service Status
 ```
-* Review SCFConfig let you edit the `scf-config-values.yaml` again
+NOTE : If you QUIT and come back, the script recovers the ENVVARs that are required from all previous steps (Useful!!).
+
+* 2 Review SCFConfig let you edit the `scf-config-values.yaml` again
 * Deploy for each elements is in the right order as there are some dependancies.
 * Pods XX will just let you watch the completion of pods deployements
 * The CF API is the config of your Cloudfoundry endpoint.
