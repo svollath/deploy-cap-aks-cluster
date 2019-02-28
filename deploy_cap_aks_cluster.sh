@@ -171,7 +171,7 @@ if [ "$mode" = "default" ]; then
    extip=\[\"$(echo "${internal_ips[*]}" | sed -e 's/ /", "/g')\"\]
    public_ip=$(az network public-ip show --resource-group $AZ_MC_RG_NAME --name $AZ_AKS_NAME-public-ip --query ipAddress --output tsv)
    domain=${public_ip}.xip.io
-   cat ./.scf-config-values.template | sed -e '/^# This/d' -e 's/<domain>/'$domain'/g' -e 's/<extip>/'"$extip"'/g' -e '/^services:/d' -s 's/<fqdn>/'"$AZ_CLUSTER_FQDN"'/g' -e 's/<password>/'"$AZ_ADMIN_PSW"'/g' -e '/loadbalanced/d' > $deploymentid/scf-config-values.yaml
+   cat ./.scf-config-values.template | sed -e '/^# This/d' -e 's/<domain>/'$domain'/g' -e 's/<extip>/'"$extip"'/g' -e '/^services:/d' -e 's/<fqdn>/'"$AZ_CLUSTER_FQDN"'/g' -e 's/<password>/'"$AZ_ADMIN_PSW"'/g' -e '/loadbalanced/d' > $deploymentid/scf-config-values.yaml
    echo -e " Public IP:\t\t\t\t${public_ip}\n \
 Private IPs (external_ips for CAP):\t$extip\n \
 Suggested DOMAIN for CAP: \t\t\"$domain\"\n\n \
