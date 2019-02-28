@@ -113,7 +113,7 @@ Now you may launch the menu driven steps for deploying CAP on the cluster just d
 when you are there, you have done a great story, and you can start to play efficiently with SCF.
 * To Connect the Kubernetes API & the metrics API, go to the Stratos GUI, and in EndPoint, select the one.
 * for Kubernetes 
-* Endpoint : `https://jml-script-jml-cap-aks-5-rg-ef6fb0-14979a95.hcp.eastus.azmk8s.io:443`
+* Endpoint : `https://jml-cap-aks-5-rg-xxxxx-yyyyyy.hcp.eastus.azmk8s.io:443` that you may find in the `$AKSDEPLOYID/deployment.log`
 * CertAuth : provide your `kubeconfig` file (that resides in the same $AKSDEPLOYID subdir at `connect` time
 
 * For metrics :
