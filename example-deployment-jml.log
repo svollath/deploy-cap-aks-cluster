@@ -1,0 +1,1037 @@
+jmlambert@linux:~/azure-cap/deploy-cap-aks-cluster-jml> ./deploy_cap_on_aks_automated.sh -c jmlcluster8.conf
+NAME                      STATUS   ROLES   AGE   VERSION
+aks-jmlpool8-29138854-0   Ready    agent   13h   v1.9.11
+aks-jmlpool8-29138854-1   Ready    agent   13h   v1.9.11
+aks-jmlpool8-29138854-2   Ready    agent   13h   v1.9.11
+aks-jmlpool8-29138854-3   Ready    agent   13h   v1.9.11
+1) Quit
+2) Review scfConfig
+3) Deploy APP All Steps
+Please enter your choice: 3
+Deploying UAA
+NAME:   susecf-uaa
+LAST DEPLOYED: Fri Mar  1 09:13:27 2019
+NAMESPACE: uaa
+STATUS: DEPLOYED
+
+RESOURCES:
+==> v1/ClusterRoleBinding
+NAME                                                AGE
+uaa-default-nonprivileged-cluster-binding           2s
+uaa-secret-generator-nonprivileged-cluster-binding  2s
+
+==> v1/Role
+NAME            AGE
+configgin-role  2s
+secrets-role    2s
+
+==> v1/RoleBinding
+NAME                                     AGE
+default-configgin-role-binding           2s
+secret-generator-secrets-role-binding    2s
+secret-generator-configgin-role-binding  2s
+
+==> v1beta1/StatefulSet
+NAME   DESIRED  CURRENT  AGE
+mysql  1        1        2s
+uaa    1        1        2s
+
+==> v1/Service
+NAME             TYPE       CLUSTER-IP   EXTERNAL-IP                                                PORT(S)                                                                          AGE
+mysql-set        ClusterIP  None         <none>                                                     13306/TCP,4567/TCP,4567/UDP,4568/TCP,9200/TCP,4444/TCP,3306/TCP,80/TCP,1936/TCP  2s
+mysql-mysql-set  ClusterIP  None         <none>                                                     13306/TCP,4567/TCP,4567/UDP,4568/TCP,9200/TCP,4444/TCP                           2s
+mysql-mysql      ClusterIP  10.0.232.54  <none>                                                     13306/TCP,4567/TCP,4567/UDP,4568/TCP,9200/TCP,4444/TCP                           2s
+mysql-proxy-set  ClusterIP  None         <none>                                                     3306/TCP,80/TCP,1936/TCP                                                         2s
+mysql-proxy      ClusterIP  10.0.43.55   <none>                                                     3306/TCP,80/TCP,1936/TCP                                                         2s
+uaa-set          ClusterIP  None         <none>                                                     8080/TCP,2793/TCP                                                                2s
+uaa-uaa-set      ClusterIP  None         <none>                                                     8080/TCP,2793/TCP                                                                2s
+uaa-uaa          ClusterIP  10.0.234.50  <none>                                                     8080/TCP,2793/TCP                                                                1s
+uaa-uaa-public   ClusterIP  10.0.99.253  52.186.13.127,10.240.0.7,10.240.0.6,10.240.0.5,10.240.0.4  2793/TCP                                                                         1s
+
+==> v1/Pod(related)
+NAME                       READY  STATUS             RESTARTS  AGE
+mysql-0                    0/1    Pending            0         2s
+uaa-0                      0/1    ContainerCreating  0         2s
+secret-generation-1-qmbv7  0/1    ContainerCreating  0         2s
+
+==> v1/Secret
+NAME                  TYPE                     DATA  AGE
+deployment-manifest   Opaque                   1     2s
+registry-credentials  kubernetes.io/dockercfg  1     2s
+secrets               Opaque                   15    2s
+
+==> v1/ServiceAccount
+NAME              SECRETS  AGE
+secret-generator  1        2s
+
+==> v1/ClusterRole
+NAME                            AGE
+uaa-cluster-role-nonprivileged  2s
+
+==> v1/Job
+NAME                 DESIRED  SUCCESSFUL  AGE
+secret-generation-1  1        0           2s
+
+
+Wait for UAA pods to be ready
+Til 2 pods to wait for in uaa
+Til 2 pods to wait for in uaa
+Til 2 pods to wait for in uaa
+Til 2 pods to wait for in uaa
+Til 2 pods to wait for in uaa
+Til 2 pods to wait for in uaa
+Til 2 pods to wait for in uaa
+Til 2 pods to wait for in uaa
+Til 2 pods to wait for in uaa
+Til 2 pods to wait for in uaa
+Til 2 pods to wait for in uaa
+Til 1 pods to wait for in uaa
+Til 1 pods to wait for in uaa
+Til 1 pods to wait for in uaa
+Til 0 pods to wait for in uaa
+Deploying SCF
+CA_CERT=-----BEGIN CERTIFICATE-----
+MIIE8jCCAtqgAwIBAgIUHwTgGbE8KP4bXFMjCsyT0dkKCUMwDQYJKoZIhvcNAQEN
+BQAwETEPMA0GA1UEAxMGU0NGIENBMB4XDTE5MDMwMTA4MDkwMFoXDTQ5MDIyMTA4
+MDkwMFowETEPMA0GA1UEAxMGU0NGIENBMIICIjANBgkqhkiG9w0BAQEFAAOCAg8A
+MIICCgKCAgEA1AquWrYttR9AqowXl7jVSosP+ucmMqeOSRURgjzpemb8FRGXaMDO
+zgqI2akgmR5KgpgEQdUZf9CAusFXbYO+RQ23+zP0LMnKmjTR1TQU6aUKOGuwWjWs
+ZeEhxi1BryItYCU65/4bmxQ3hJZ67aeMcRizJZ2NkpbfyMYryiAuTcHxi1bjLCmx
+7kYFjzg6s9LD8mVy5HOyUtszT5vBuoypXCRMdA0Mzjz/e5MOA19Q71+XA5w1xT+Z
+iOV+XPJ7x5JNtz3w1/sClrqdrLXu3s9qoeh5ZMt1K8yFemehQ8Q3fE3YacPiIi/P
+qCaQgMpgHrQtwHa13y1UeykyaTieM0SsK/xfAS2FOJNHsaFQYJ1jIKav1nMrP1Ay
+n8R3wg4+eRszB9Z6tFmp0cqzWfNgFYEXEqv2ESoAIoPP+uyOQA0jYPIsFnzInbuJ
+EI9qNWVMF/0aLnHFAf58vN+CDXOl/Y/1TkW/6RX0HXamtrq47PmXV3i0E+CKyPxW
++jGhhJR4EveOMjTqZanF2o0M8Lt7cmd49Moyw9/b7bUCoqtmZO//4k9ny8WbauW7
+850g6ejPeRCLgo7zy/xgrqUKke4Zht1zCRmH/NzNZ23ecF2KBVBXfrREr/xNNpl+
+cN1vpdtQQthSKMuN6IzGK0K0NGEkgd6JPDXhc1ZsLiD0ev3H4IFGgSUCAwEAAaNC
+MEAwDgYDVR0PAQH/BAQDAgEGMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFDZp
+AZLkoR/0uT7q4HE8yXKSIkQ5MA0GCSqGSIb3DQEBDQUAA4ICAQC2RitZ+TuyTeEG
+cth7U81OkwdYQ0BAnldbj5UcrppqSOBO3G9ESP9lQnl5QplK2iNudj6/9IfuMeYH
+k563nMvTeKa/QFxEGKm9aqxxnkhJawy6CEuFM4YHThEGh2bOgKJ72NOknfwGbkS9
+QqxpJTqt/dN28aJA65SrCvIFyZfyagrUjlxgkL8m9hv0/KUT3t8xw9Wgl6SX2hvw
+6kOqpEPMW0SIkm2OrxCaLHNYXdiiXvSSUoKJyh55NS2g/68LoLHBtk7UoaFBU1Pw
+z0nEHhusiNe9VJHoz6ROyuICaH8suo4BxIEdEPHtbkS1VMvV1Jg8HgWntJ2pZ/mD
+UWr+2dAk4CEXzVMGkkJJ7r2y1W9k10PP4YcbrO+S+h1Uy6yL3zW+ecCzDoqh0jhn
+opRKDozLgig98Kyo2k1QT0ttpYoqt2KZU7rIYtpcVC3ffDPxjF7vF5ZuZWvKifW5
+lo3cwkDIFgYcg/r/FN72HhbE/xFw4+MZte5kxHpj+SjdgK4I6oraTzWbKDBHiP9p
+jcgWRT3fuZHamH8IEqjxXoEAHhZiG8bJq5HBWhkTcNsgW8AiLkoF9Gj+uvQ2+pgi
+hjhvAkvsGRRgms3fojZjLVsaqVREsqglrz3olllrPmUPPU7S7cuawSRx86opYHqs
+BvQsfcKzMg+b8dWeqxSz4RHPwneVPw==
+-----END CERTIFICATE-----
+NAME:   susecf-scf
+LAST DEPLOYED: Fri Mar  1 09:18:43 2019
+NAMESPACE: scf
+STATUS: DEPLOYED
+
+RESOURCES:
+==> v1/ClusterRoleBinding
+NAME                                                            AGE
+scf-default-privileged-privileged-cluster-binding               7s
+scf-default-privileged-nonprivileged-cluster-binding            7s
+scf-default-nonprivileged-cluster-binding                       7s
+scf-privileged-privileged-cluster-binding                       7s
+scf-withsysresource-withsysresource-cluster-binding             7s
+scf-garden-runc-privileged-cluster-binding                      7s
+scf-garden-runc-node-reader-role-cluster-binding                7s
+scf-withsysresource-privileged-withsysresource-cluster-binding  7s
+scf-withsysresource-privileged-privileged-cluster-binding       7s
+scf-secret-generator-nonprivileged-cluster-binding              7s
+
+==> v1/RoleBinding
+NAME                                               AGE
+default-privileged-configgin-role-binding          7s
+default-configgin-role-binding                     7s
+privileged-configgin-role-binding                  7s
+withsysresource-configgin-role-binding             7s
+garden-runc-configgin-role-binding                 7s
+withsysresource-privileged-configgin-role-binding  7s
+secret-generator-secrets-role-binding              7s
+secret-generator-configgin-role-binding            7s
+
+==> v1beta1/StatefulSet
+NAME              DESIRED  CURRENT  AGE
+adapter           1        1        7s
+api-group         1        1        7s
+blobstore         1        1        7s
+cc-clock          1        1        7s
+cc-uploader       1        1        7s
+cc-worker         1        1        7s
+cf-usb-group      1        1        7s
+diego-api         1        1        7s
+diego-brain       1        1        7s
+diego-cell        1        1        7s
+diego-ssh         1        1        7s
+doppler           1        1        7s
+log-api           1        1        7s
+mysql             1        1        7s
+nats              1        1        7s
+nfs-broker        1        1        6s
+router            1        1        6s
+routing-api       1        1        6s
+syslog-scheduler  1        1        6s
+tcp-router        1        1        6s
+
+==> v1/Job
+NAME                     DESIRED  SUCCESSFUL  AGE
+post-deployment-setup-1  1        0           6s
+secret-generation-1      1        0           6s
+
+==> v1/Service
+NAME                                       TYPE       CLUSTER-IP    EXTERNAL-IP                                                PORT(S)                                                                                             AGE
+adapter-set                                ClusterIP  None          <none>                                                     4443/TCP,8080/TCP                                                                                   6s
+adapter-adapter-set                        ClusterIP  None          <none>                                                     4443/TCP,8080/TCP                                                                                   6s
+adapter-adapter                            ClusterIP  10.0.237.136  <none>                                                     4443/TCP,8080/TCP                                                                                   6s
+api-group-set                              ClusterIP  None          <none>                                                     9022/TCP,9023/TCP,8125/TCP                                                                          6s
+api-set                                    ClusterIP  None          <none>                                                     9022/TCP,9023/TCP,8125/TCP                                                                          6s
+api                                        ClusterIP  10.0.122.165  <none>                                                     9022/TCP,9023/TCP,8125/TCP                                                                          6s
+blobstore-set                              ClusterIP  None          <none>                                                     8080/TCP,4443/TCP                                                                                   6s
+blobstore-blobstore-set                    ClusterIP  None          <none>                                                     8080/TCP,4443/TCP                                                                                   6s
+blobstore-blobstore                        ClusterIP  10.0.198.142  <none>                                                     8080/TCP,4443/TCP                                                                                   6s
+cc-uploader-set                            ClusterIP  None          <none>                                                     9091/TCP,17018/TCP                                                                                  6s
+cc-uploader-cc-uploader-set                ClusterIP  None          <none>                                                     9091/TCP,17018/TCP                                                                                  6s
+cc-uploader-cc-uploader                    ClusterIP  10.0.95.39    <none>                                                     9091/TCP,17018/TCP                                                                                  6s
+cf-usb-group-set                           ClusterIP  None          <none>                                                     24054/TCP,24053/TCP                                                                                 5s
+cf-usb-set                                 ClusterIP  None          <none>                                                     24054/TCP,24053/TCP                                                                                 5s
+cf-usb                                     ClusterIP  10.0.10.131   <none>                                                     24054/TCP,24053/TCP                                                                                 5s
+diego-api-set                              ClusterIP  None          <none>                                                     8889/TCP,17017/TCP,8891/TCP                                                                         5s
+diego-api-bbs-set                          ClusterIP  None          <none>                                                     8889/TCP,17017/TCP                                                                                  5s
+diego-api-bbs                              ClusterIP  10.0.22.175   <none>                                                     8889/TCP,17017/TCP                                                                                  5s
+diego-api-locket-set                       ClusterIP  None          <none>                                                     8891/TCP                                                                                            5s
+diego-api-locket                           ClusterIP  10.0.111.95   <none>                                                     8891/TCP                                                                                            5s
+diego-brain-set                            ClusterIP  None          <none>                                                     9016/TCP                                                                                            5s
+diego-brain-auctioneer-set                 ClusterIP  None          <none>                                                     9016/TCP                                                                                            5s
+diego-brain-auctioneer                     ClusterIP  10.0.54.147   <none>                                                     9016/TCP                                                                                            5s
+diego-cell-set                             ClusterIP  None          <none>                                                     1801/TCP,7589/TCP,7590/TCP                                                                          5s
+diego-cell-rep-set                         ClusterIP  None          <none>                                                     1801/TCP                                                                                            5s
+diego-cell-rep                             ClusterIP  10.0.9.104    <none>                                                     1801/TCP                                                                                            4s
+diego-cell-nfsv3driver-set                 ClusterIP  None          <none>                                                     7589/TCP,7590/TCP                                                                                   4s
+diego-cell-nfsv3driver                     ClusterIP  10.0.207.114  <none>                                                     7589/TCP,7590/TCP                                                                                   4s
+diego-ssh-set                              ClusterIP  None          <none>                                                     2222/TCP,8080/TCP                                                                                   4s
+diego-ssh-ssh-proxy-set                    ClusterIP  None          <none>                                                     2222/TCP                                                                                            4s
+diego-ssh-ssh-proxy                        ClusterIP  10.0.249.251  <none>                                                     2222/TCP                                                                                            4s
+diego-ssh-ssh-proxy-public                 ClusterIP  10.0.238.203  52.186.13.127,10.240.0.7,10.240.0.6,10.240.0.5,10.240.0.4  2222/TCP                                                                                            4s
+diego-access-set                           ClusterIP  None          <none>                                                     8080/TCP                                                                                            4s
+diego-access                               ClusterIP  10.0.228.191  <none>                                                     8080/TCP                                                                                            4s
+doppler-set                                ClusterIP  None          <none>                                                     3457/UDP,3458/TCP,3459/TCP,8081/TCP,8082/TCP                                                        4s
+doppler-doppler-set                        ClusterIP  None          <none>                                                     3457/UDP,3458/TCP,3459/TCP,8081/TCP,8082/TCP                                                        4s
+doppler-doppler                            ClusterIP  10.0.109.212  <none>                                                     3457/UDP,3458/TCP,3459/TCP,8081/TCP,8082/TCP                                                        4s
+log-api-set                                ClusterIP  None          <none>                                                     8081/TCP,8082/TCP                                                                                   4s
+log-api-loggregator-trafficcontroller-set  ClusterIP  None          <none>                                                     8081/TCP                                                                                            4s
+log-api-loggregator-trafficcontroller      ClusterIP  10.0.155.250  <none>                                                     8081/TCP                                                                                            4s
+log-api-reverse-log-proxy-set              ClusterIP  None          <none>                                                     8082/TCP                                                                                            4s
+log-api-reverse-log-proxy                  ClusterIP  10.0.51.73    <none>                                                     8082/TCP                                                                                            4s
+mysql-set                                  ClusterIP  None          <none>                                                     13306/TCP,4567/TCP,4567/UDP,4568/TCP,9200/TCP,4444/TCP,8080/TCP,3306/TCP,1936/TCP                   4s
+mysql-mysql-set                            ClusterIP  None          <none>                                                     13306/TCP,4567/TCP,4567/UDP,4568/TCP,9200/TCP,4444/TCP                                              4s
+mysql-mysql                                ClusterIP  10.0.174.185  <none>                                                     13306/TCP,4567/TCP,4567/UDP,4568/TCP,9200/TCP,4444/TCP                                              4s
+mysql-proxy-set                            ClusterIP  None          <none>                                                     8080/TCP,3306/TCP,1936/TCP                                                                          4s
+mysql-proxy                                ClusterIP  10.0.119.72   <none>                                                     8080/TCP,3306/TCP,1936/TCP                                                                          4s
+nats-set                                   ClusterIP  None          <none>                                                     4222/TCP,4223/TCP                                                                                   4s
+nats-nats-set                              ClusterIP  None          <none>                                                     4222/TCP,4223/TCP                                                                                   4s
+nats-nats                                  ClusterIP  10.0.120.199  <none>                                                     4222/TCP,4223/TCP                                                                                   3s
+nfs-broker-set                             ClusterIP  None          <none>                                                     8999/TCP                                                                                            3s
+nfs-broker-nfsbroker-set                   ClusterIP  None          <none>                                                     8999/TCP                                                                                            3s
+nfs-broker-nfsbroker                       ClusterIP  10.0.47.160   <none>                                                     8999/TCP                                                                                            3s
+router-set                                 ClusterIP  None          <none>                                                     80/TCP,443/TCP,4443/TCP                                                                             3s
+router-gorouter-set                        ClusterIP  None          <none>                                                     80/TCP,443/TCP,4443/TCP                                                                             3s
+router-gorouter                            ClusterIP  10.0.49.165   <none>                                                     80/TCP,443/TCP,4443/TCP                                                                             3s
+router-gorouter-public                     ClusterIP  10.0.36.130   52.186.13.127,10.240.0.7,10.240.0.6,10.240.0.5,10.240.0.4  80/TCP,443/TCP,4443/TCP                                                                             3s
+routing-api-set                            ClusterIP  None          <none>                                                     3000/TCP                                                                                            3s
+routing-api-routing-api-set                ClusterIP  None          <none>                                                     3000/TCP                                                                                            3s
+routing-api-routing-api                    ClusterIP  10.0.85.132   <none>                                                     3000/TCP                                                                                            3s
+syslog-scheduler-set                       ClusterIP  None          <none>                                                     8080/TCP                                                                                            3s
+syslog-scheduler-scheduler-set             ClusterIP  None          <none>                                                     8080/TCP                                                                                            3s
+syslog-scheduler-scheduler                 ClusterIP  10.0.100.55   <none>                                                     8080/TCP                                                                                            3s
+tcp-router-set                             ClusterIP  None          <none>                                                     2341/TCP,20000/TCP,20001/TCP,20002/TCP,20003/TCP,20004/TCP,20005/TCP,20006/TCP,20007/TCP,20008/TCP  3s
+tcp-router-tcp-router-set                  ClusterIP  None          <none>                                                     2341/TCP,20000/TCP,20001/TCP,20002/TCP,20003/TCP,20004/TCP,20005/TCP,20006/TCP,20007/TCP,20008/TCP  3s
+tcp-router-tcp-router                      ClusterIP  10.0.67.134   <none>                                                     2341/TCP,20000/TCP,20001/TCP,20002/TCP,20003/TCP,20004/TCP,20005/TCP,20006/TCP,20007/TCP,20008/TCP  3s
+tcp-router-tcp-router-public               ClusterIP  10.0.252.13   52.186.13.127,10.240.0.7,10.240.0.6,10.240.0.5,10.240.0.4  20000/TCP,20001/TCP,20002/TCP,20003/TCP,20004/TCP,20005/TCP,20006/TCP,20007/TCP,20008/TCP           3s
+
+==> v1/Pod(related)
+NAME                           READY  STATUS             RESTARTS  AGE
+adapter-0                      0/2    ContainerCreating  0         7s
+api-group-0                    0/2    ContainerCreating  0         7s
+blobstore-0                    0/2    Pending            0         7s
+cc-clock-0                     0/2    ContainerCreating  0         7s
+cc-uploader-0                  0/2    ContainerCreating  0         6s
+cc-worker-0                    0/2    ContainerCreating  0         6s
+cf-usb-group-0                 0/1    ContainerCreating  0         6s
+diego-api-0                    0/2    ContainerCreating  0         6s
+diego-brain-0                  0/2    ContainerCreating  0         6s
+diego-cell-0                   0/2    Pending            0         6s
+diego-ssh-0                    0/2    ContainerCreating  0         5s
+doppler-0                      0/2    ContainerCreating  0         5s
+log-api-0                      0/2    ContainerCreating  0         5s
+mysql-0                        0/1    Pending            0         5s
+nats-0                         0/2    ContainerCreating  0         5s
+nfs-broker-0                   0/1    ContainerCreating  0         5s
+router-0                       0/2    ContainerCreating  0         4s
+routing-api-0                  0/2    ContainerCreating  0         4s
+syslog-scheduler-0             0/2    ContainerCreating  0         4s
+tcp-router-0                   0/2    ContainerCreating  0         4s
+post-deployment-setup-1-8kq2s  0/1    ContainerCreating  0         6s
+secret-generation-1-k4f4n      0/1    ContainerCreating  0         6s
+
+==> v1/Secret
+NAME                  TYPE                     DATA  AGE
+deployment-manifest   Opaque                   1     8s
+registry-credentials  kubernetes.io/dockercfg  1     8s
+secrets               Opaque                   113   8s
+
+==> v1/ClusterRole
+NAME                               AGE
+scf-cluster-role-nonprivileged     8s
+scf-cluster-role-privileged        8s
+scf-cluster-role-withsysresource   7s
+scf-cluster-role-node-reader-role  7s
+
+==> v1beta1/PodSecurityPolicy
+NAME                     DATA   CAPS            SELINUX   RUNASUSER  FSGROUP   SUPGROUP  READONLYROOTFS  VOLUMES
+scf-psp-withsysresource  false  [SYS_RESOURCE]  RunAsAny  RunAsAny   RunAsAny  RunAsAny  false           [configMap secret emptyDir downwardAPI projected persistentVolumeClaim nfs]
+
+==> v1/ServiceAccount
+NAME                        SECRETS  AGE
+default-privileged          1        8s
+privileged                  1        8s
+withsysresource             1        8s
+garden-runc                 1        8s
+withsysresource-privileged  1        8s
+secret-generator            1        8s
+
+==> v1/Role
+NAME            AGE
+configgin-role  7s
+secrets-role    7s
+
+
+NOTES:
+    Welcome to your new deployment of SCF.
+
+    The endpoint for use by the `cf` client is
+        https://api.52.186.13.127.xip.io
+
+    To target this endpoint run
+        cf api --skip-ssl-validation https://api.52.186.13.127.xip.io
+
+    Please remember, it may take some time for everything to come online.
+
+    You can use
+        kubectl get pods --namespace scf
+
+    to spot-check if everything is up and running, or
+        watch -c 'kubectl get pods --namespace scf'
+
+    to monitor continuously.
+
+    The online documentation (release notes, deployment guide) can be found at
+        https://www.suse.com/documentation/cloud-application-platform-1
+
+Wait for SCF pods to be ready
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 22 pods to wait for in scf
+Til 21 pods to wait for in scf
+Til 21 pods to wait for in scf
+Til 21 pods to wait for in scf
+Til 21 pods to wait for in scf
+Til 20 pods to wait for in scf
+Til 18 pods to wait for in scf
+Til 18 pods to wait for in scf
+Til 17 pods to wait for in scf
+Til 15 pods to wait for in scf
+Til 14 pods to wait for in scf
+Til 14 pods to wait for in scf
+Til 12 pods to wait for in scf
+Unable to connect to the server: net/http: TLS handshake timeout
+Til 0 pods to wait for in scf
+Deploy CATALOG
+"svc-cat" has been added to your repositories
+Hang tight while we grab the latest from your chart repositories...
+...Skip local chart repository
+...Successfully got an update from the "suse" chart repository
+...Successfully got an update from the "svc-cat" chart repository
+...Successfully got an update from the "stratos" chart repository
+...Successfully got an update from the "gitlab" chart repository
+...Successfully got an update from the "jenkins-x" chart repository
+...Successfully got an update from the "azure" chart repository
+...Successfully got an update from the "stable" chart repository
+Update Complete. ⎈ Happy Helming!⎈ 
+NAME:   catalog
+LAST DEPLOYED: Fri Mar  1 09:32:07 2019
+NAMESPACE: catalog
+STATUS: DEPLOYED
+
+RESOURCES:
+==> v1/PersistentVolumeClaim
+NAME                  STATUS   VOLUME   CAPACITY  ACCESS MODES  STORAGECLASS  AGE
+catalog-catalog-etcd  Pending  default  1s
+
+==> v1/Service
+NAME                       TYPE      CLUSTER-IP    EXTERNAL-IP  PORT(S)        AGE
+catalog-catalog-apiserver  NodePort  10.0.231.172  <none>       443:30443/TCP  1s
+
+==> v1beta1/Deployment
+NAME                                DESIRED  CURRENT  UP-TO-DATE  AVAILABLE  AGE
+catalog-catalog-apiserver           1        0        0           0          1s
+catalog-catalog-controller-manager  1        1        1           0          1s
+
+==> v1beta1/APIService
+NAME                           AGE
+v1beta1.servicecatalog.k8s.io  1s
+
+==> v1/ClusterRole
+servicecatalog.k8s.io:apiserver                  1s
+servicecatalog.k8s.io:controller-manager         1s
+servicecatalog.k8s.io:service-catalog-readiness  1s
+
+==> v1/Role
+servicecatalog.k8s.io:cluster-info-configmap             1s
+servicecatalog.k8s.io:leader-locking-controller-manager  1s
+
+==> v1/ServiceAccount
+NAME                                SECRETS  AGE
+service-catalog-apiserver           1        1s
+service-catalog-controller-manager  1        1s
+
+==> v1/Secret
+NAME                            TYPE    DATA  AGE
+catalog-catalog-apiserver-cert  Opaque  2     1s
+
+==> v1/ClusterRoleBinding
+NAME                                             AGE
+servicecatalog.k8s.io:apiserver                  1s
+servicecatalog.k8s.io:apiserver-auth-delegator   1s
+servicecatalog.k8s.io:controller-manager         1s
+servicecatalog.k8s.io:service-catalog-readiness  1s
+
+==> v1/RoleBinding
+NAME                                                   AGE
+servicecatalog.k8s.io:apiserver-authentication-reader  1s
+service-catalog-controller-manager-cluster-info        1s
+service-catalog-controller-manager-leader-election     1s
+
+==> v1/Pod(related)
+NAME                                                 READY  STATUS             RESTARTS  AGE
+catalog-catalog-controller-manager-7b966b77b7-b5466  0/1    ContainerCreating  0         0s
+
+
+Wait for CATALOG pods to be ready
+Til 1 pods to wait for in catalog
+Til 1 pods to wait for in catalog
+Til 1 pods to wait for in catalog
+Til 1 pods to wait for in catalog
+Til 1 pods to wait for in catalog
+Til 1 pods to wait for in catalog
+Til 0 pods to wait for in catalog
+Create Azure SB
+{
+  "id": "/subscriptions/ef6fb0a8-2419-43f7-9ef7-6f01662a29be/resourceGroups/fOWtfDCL-service-broker",
+  "location": "eastus",
+  "managedBy": null,
+  "name": "fOWtfDCL-service-broker",
+  "properties": {
+    "provisioningState": "Succeeded"
+  },
+  "tags": null,
+  "type": null
+}
+SBRGNAME=fOWtfDCL-service-broker
+Changing "fOWtfDCL-service-broker" to a valid URI of "http://fOWtfDCL-service-broker", which is the required format used for service principal names
+Retrying role assignment creation: 1/36
+Deploy OSBA
+"azure" has been added to your repositories
+Hang tight while we grab the latest from your chart repositories...
+...Skip local chart repository
+...Successfully got an update from the "stratos" chart repository
+...Successfully got an update from the "svc-cat" chart repository
+...Successfully got an update from the "suse" chart repository
+...Successfully got an update from the "gitlab" chart repository
+...Successfully got an update from the "jenkins-x" chart repository
+...Successfully got an update from the "azure" chart repository
+...Successfully got an update from the "stable" chart repository
+Update Complete. ⎈ Happy Helming!⎈ 
+REGION=eastus
+SUBSCRIPTION_ID=ef6fb0a8-2419-43f7-9ef7-6f01662a29be ; TENANT_ID=856b813c-16e5-49a5-85ec-6f081e13b527; CLIENT_ID=0c1f4900-45e0-4a4b-b941-7fec8acd2f65; CLIENT_SECRET=528e91bb-e043-4d6f-ae75-5cb65705ba05
+NAME:   osba
+LAST DEPLOYED: Fri Mar  1 09:34:57 2019
+NAMESPACE: osba
+STATUS: DEPLOYED
+
+RESOURCES:
+==> v1/PersistentVolumeClaim
+NAME        STATUS   VOLUME   CAPACITY  ACCESS MODES  STORAGECLASS  AGE
+osba-redis  Pending  default  1s
+
+==> v1/Service
+NAME                            TYPE       CLUSTER-IP   EXTERNAL-IP  PORT(S)   AGE
+osba-redis                      ClusterIP  10.0.26.20   <none>       6379/TCP  1s
+osba-open-service-broker-azure  ClusterIP  10.0.161.35  <none>       80/TCP    1s
+
+==> v1beta1/Deployment
+NAME                            DESIRED  CURRENT  UP-TO-DATE  AVAILABLE  AGE
+osba-redis                      1        1        1           0          1s
+osba-open-service-broker-azure  1        1        1           0          0s
+
+==> v1beta1/ClusterServiceBroker
+NAME  AGE
+osba  0s
+
+==> v1/Pod(related)
+NAME                                             READY  STATUS             RESTARTS  AGE
+osba-redis-c555f5c6-bnrvs                        0/1    Pending            0         0s
+osba-open-service-broker-azure-6cf599c57d-m5tlt  0/1    ContainerCreating  0         0s
+
+==> v1/Secret
+NAME                                 TYPE    DATA  AGE
+osba-redis                           Opaque  1     1s
+osba-open-service-broker-azure-auth  Opaque  2     1s
+osba-open-service-broker-azure       Opaque  4     1s
+
+
+NOTES:
+
+
+Wait for OSBA pods to be ready
+Til 2 pods to wait for in osba
+Til 2 pods to wait for in osba
+Til 2 pods to wait for in osba
+Til 2 pods to wait for in osba
+Til 2 pods to wait for in osba
+Til 0 pods to wait for in osba
+CF API set
+CF Endpoint : https://api.52.186.13.127.xip.io
+Setting api endpoint to https://api.52.186.13.127.xip.io...
+OK
+
+api endpoint:   https://api.52.186.13.127.xip.io
+api version:    2.120.0
+Not logged in. Use 'cf login' to log in.
+API endpoint: https://api.52.186.13.127.xip.io
+Authenticating...
+OK
+
+Targeted org system
+
+
+                
+API endpoint:   https://api.52.186.13.127.xip.io (API version: 2.120.0)
+User:           admin
+Org:            system
+Space:          No space targeted, use 'cf target -s SPACE'
+CF Add SB
+Creating service broker azure as admin...
+OK
+Enabling access of plan basic for service azure-postgresql-9-6 as admin...
+OK
+Enabling access of plan basic for service azure-postgresql-9-6-dbms as admin...
+OK
+Enabling access of plan basic for service azure-postgresql-10 as admin...
+OK
+Enabling access of plan basic for service azure-postgresql-10-dbms as admin...
+OK
+Enabling access of plan basic for service azure-rediscache as admin...
+OK
+Enabling access of plan basic for service azure-mysql-5-7 as admin...
+OK
+Enabling access of plan basic for service azure-mysql-5-7-dbms as admin...
+OK
+Enabling access of plan basic for service azure-sql-12-0 as admin...
+OK
+Enabling access of plan basic for service azure-sql-12-0-database as admin...
+OK
+Enabling access of plan account for service azure-cosmosdb-mongo-account as admin...
+OK
+CF Create Org and Space
+Creating org testorg as admin...
+OK
+
+Assigning role OrgManager to user admin in org testorg...
+OK
+
+TIP: Use 'cf target -o "testorg"' to target new org
+Creating space scftest in org testorg as admin...
+OK
+Assigning role SpaceManager to user admin in org testorg / space scftest as admin...
+OK
+Assigning role SpaceDeveloper to user admin in org testorg / space scftest as admin...
+OK
+
+TIP: Use 'cf target -o "testorg" -s "scftest"' to target new space
+api endpoint:   https://api.52.186.13.127.xip.io
+api version:    2.120.0
+user:           admin
+org:            testorg
+space:          scftest
+CF 1st Service
+Creating service instance scf-rails-example-db in org testorg / space scftest as admin...
+OK
+
+Create in progress. Use 'cf services' or 'cf service scf-rails-example-db' to check operation status.
+Wait for SCF 1st Service to be ready
+./deploy_cap_on_aks_automated.sh: line 116: [: progress: integer expression expected
+AZ Disable SSL Mysql DBs
+{
+  "administratorLogin": "azureuser",
+  "earliestRestoreDate": "2019-03-01T08:47:40.923000+00:00",
+  "fullyQualifiedDomainName": "e2d84541-37fc-494f-8fb9-45bfb8652faa.mysql.database.azure.com",
+  "id": "/subscriptions/ef6fb0a8-2419-43f7-9ef7-6f01662a29be/resourceGroups/fOWtfDCL-service-broker/providers/Microsoft.DBforMySQL/servers/e2d84541-37fc-494f-8fb9-45bfb8652faa",
+  "location": "eastus",
+  "masterServerId": "",
+  "name": "e2d84541-37fc-494f-8fb9-45bfb8652faa",
+  "replicaCapacity": 5,
+  "replicationRole": "None",
+  "resourceGroup": "fOWtfDCL-service-broker",
+  "sku": {
+    "capacity": 1,
+    "family": "Gen5",
+    "name": "B_Gen5_1",
+    "size": null,
+    "tier": "Basic"
+  },
+  "sslEnforcement": "Disabled",
+  "storageProfile": {
+    "backupRetentionDays": 7,
+    "geoRedundantBackup": "Disabled",
+    "storageAutoGrow": "Disabled",
+    "storageMb": 10240
+  },
+  "tags": {
+    "heritage": "open-service-broker-azure"
+  },
+  "type": "Microsoft.DBforMySQL/servers",
+  "userVisibleState": "Ready",
+  "version": "5.7"
+}
+Deploy 1st Rails Appl
+Clone the rails application to consume the mySQL db
+Cloning into 'CAP-AKS-2019-02-28_19h31_jmlcluster8/rails-example'...
+remote: Enumerating objects: 15, done.
+remote: Counting objects: 100% (15/15), done.
+remote: Compressing objects: 100% (15/15), done.
+remote: Total 171 (delta 4), reused 5 (delta 0), pack-reused 156
+Receiving objects: 100% (171/171), 37.43 KiB | 0 bytes/s, done.
+Resolving deltas: 100% (46/46), done.
+Push the application to SCF
+Pushing from manifest to org testorg / space scftest as admin...
+Using manifest file /home/jmlambert/azure-cap/deploy-cap-aks-cluster-jml/CAP-AKS-2019-02-28_19h31_jmlcluster8/rails-example/manifest.yml
+Getting app info...
+Creating app with these attributes...
++ name:        scf-rails-example
+  path:        /home/jmlambert/azure-cap/deploy-cap-aks-cluster-jml/CAP-AKS-2019-02-28_19h31_jmlcluster8/rails-example
++ command:     bundle exec rake db:migrate && bundle exec rails s -p $PORT
++ instances:   1
++ memory:      256M
+  services:
++   scf-rails-example-db
+  routes:
++   scf-rails-example.52.186.13.127.xip.io
+
+Creating app scf-rails-example...
+Mapping routes...
+Binding services...
+Comparing local files to remote cache...
+Packaging files to upload...
+Uploading files...
+ 37.93 KiB / 37.93 KiB [================================================================================] 100.00% 1s
+
+Waiting for API to complete processing files...
+
+Staging app and tracing logs...
+   Downloading dotnet-core_buildpack...
+   Downloading nodejs_buildpack...
+   Downloading go_buildpack...
+   Downloading ruby_buildpack...
+   Downloaded dotnet-core_buildpack (3.8M)
+   Downloading python_buildpack...
+   Downloaded nodejs_buildpack (4.6M)
+   Downloading php_buildpack...
+   Downloaded ruby_buildpack (4.6M)
+   Downloading binary_buildpack...
+   Downloaded go_buildpack (4.5M)
+   Downloading nginx_buildpack...
+   Downloaded php_buildpack (360.2K)
+   Downloading staticfile_buildpack...
+   Downloaded binary_buildpack (4.2M)
+   Downloading java_buildpack...
+   Downloaded java_buildpack (212.4K)
+   Downloaded python_buildpack (4.5M)
+   Downloaded nginx_buildpack (7.5M)
+   Downloaded staticfile_buildpack (5M)
+   Cell diego-cell-0 creating container for instance 8d073823-3f5d-4b6e-9dbe-23e11314d8d3
+   Cell diego-cell-0 successfully created container for instance 8d073823-3f5d-4b6e-9dbe-23e11314d8d3
+   Downloading app package...
+   Downloaded app package (37.9K)
+   -----> Ruby Buildpack version 1.7.31.1
+   -----> Supplying Ruby
+   -----> Installing bundler 1.17.3
+          Download [https://cf-buildpacks.suse.com/dependencies/bundler/bundler-1.17.3-sle12-bcc80b9a.tgz]
+   -----> Installing bundler 2.0.1
+          Download [https://cf-buildpacks.suse.com/dependencies/bundler/bundler-2.0.1-sle12-c4db08c3.tgz]
+   -----> Installing ruby 2.5.3
+          Download [https://cf-buildpacks.suse.com/dependencies/ruby/ruby-2.5.3-linux-x64-sle12-00c25088.tgz]
+   -----> Update rubygems from 2.7.6 to 3.0.2
+   -----> Installing rubygems 3.0.2
+          Download [https://cf-buildpacks.suse.com/dependencies/rubygems/rubygems-3.0.2-ad7433a4.tgz]
+   -----> Installing node 6.16.0
+          Download [https://cf-buildpacks.suse.com/dependencies/node/node-6.16.0-linux-x64-sle12-2ddc46ba.tgz]
+   -----> Installing dependencies using bundler 2.0.1
+          Running: bundle install --without development:test --jobs=4 --retry=4 --path /tmp/contents982664144/deps/0/vendor_bundle --binstubs /tmp/contents982664144/deps/0/binstubs --deployment
+          The dependency tzinfo-data (>= 0) will be unused by any of the platforms Bundler is installing for. Bundler is installing for ruby but the dependency is only for x86-mingw32, x86-mswin32, x64-mingw32, java. To add those platforms to the bundle, run `bundle lock --add-platform x86-mingw32 x86-mswin32 x64-mingw32 java`.
+          Fetching gem metadata from https://rubygems.org/............
+          Fetching rake 12.3.1
+          Installing rake 12.3.1
+          Fetching minitest 5.11.3
+          Fetching thread_safe 0.3.6
+          Fetching concurrent-ruby 1.1.3
+          Installing thread_safe 0.3.6
+          Installing minitest 5.11.3
+          Installing concurrent-ruby 1.1.3
+          Fetching builder 3.2.3
+          Installing builder 3.2.3
+          Fetching erubi 1.7.1
+          Installing erubi 1.7.1
+          Fetching mini_portile2 2.3.0
+          Fetching crass 1.0.4
+          Installing mini_portile2 2.3.0
+          Fetching rack 2.0.6
+          Installing crass 1.0.4
+          Fetching nio4r 2.3.1
+          Installing rack 2.0.6
+          Fetching websocket-extensions 0.1.3
+          Installing nio4r 2.3.1 with native extensions
+          Installing websocket-extensions 0.1.3
+          Fetching mini_mime 1.0.1
+          Installing mini_mime 1.0.1
+          Fetching arel 9.0.0
+          Fetching mimemagic 0.3.2
+          Installing arel 9.0.0
+          Fetching msgpack 1.2.4
+          Installing mimemagic 0.3.2
+          Installing msgpack 1.2.4 with native extensions
+          Using bundler 1.17.3
+          Fetching coffee-script-source 1.12.2
+          Installing coffee-script-source 1.12.2
+          Fetching execjs 2.7.0
+          Installing execjs 2.7.0
+          Fetching method_source 0.9.2
+          Installing method_source 0.9.2
+          Fetching thor 0.20.3
+          Installing thor 0.20.3
+          Fetching ffi 1.9.25
+          Installing ffi 1.9.25 with native extensions
+          Fetching multi_json 1.13.1
+          Installing multi_json 1.13.1
+          Fetching rb-fsevent 0.10.3
+          Installing rb-fsevent 0.10.3
+          Fetching ruby_dep 1.5.0
+          Installing ruby_dep 1.5.0
+          Fetching mysql2 0.5.2
+          Installing mysql2 0.5.2 with native extensions
+          Fetching pg 1.1.3
+          Installing pg 1.1.3 with native extensions
+          Fetching puma 3.12.0
+          Installing puma 3.12.0 with native extensions
+          Fetching tilt 2.0.8
+          Installing tilt 2.0.8
+          Fetching turbolinks-source 5.2.0
+          Installing turbolinks-source 5.2.0
+          Fetching tzinfo 1.2.5
+          Installing tzinfo 1.2.5
+          Fetching i18n 1.1.1
+          Installing i18n 1.1.1
+          Fetching nokogiri 1.8.5
+          Installing nokogiri 1.8.5 with native extensions
+          Fetching websocket-driver 0.7.0
+          Installing websocket-driver 0.7.0 with native extensions
+          Fetching mail 2.7.1
+          Installing mail 2.7.1
+          Fetching rack-test 1.1.0
+          Installing rack-test 1.1.0
+          Fetching sprockets 3.7.2
+          Installing sprockets 3.7.2
+          Fetching marcel 0.3.3
+          Installing marcel 0.3.3
+          Fetching coffee-script 2.4.1
+          Installing coffee-script 2.4.1
+          Fetching uglifier 4.1.20
+          Installing uglifier 4.1.20
+          Fetching bootsnap 1.3.2
+          Installing bootsnap 1.3.2 with native extensions
+          Fetching rb-inotify 0.9.10
+          Installing rb-inotify 0.9.10
+          Fetching turbolinks 5.2.0
+          Installing turbolinks 5.2.0
+          Fetching activesupport 5.2.1
+          Fetching loofah 2.2.3
+          Installing loofah 2.2.3
+          Installing activesupport 5.2.1
+          Fetching listen 3.1.5
+          Installing listen 3.1.5
+          Fetching sass-listen 4.0.0
+          Installing sass-listen 4.0.0
+          Fetching rails-html-sanitizer 1.0.4
+          Fetching rails-dom-testing 2.0.3
+          Fetching globalid 0.4.1
+          Installing rails-html-sanitizer 1.0.4
+          Installing rails-dom-testing 2.0.3
+          Fetching activemodel 5.2.1
+          Installing globalid 0.4.1
+          Fetching jbuilder 2.8.0
+          Fetching sass 3.7.2
+          Installing activemodel 5.2.1
+          Installing jbuilder 2.8.0
+          Installing sass 3.7.2
+          Fetching actionview 5.2.1
+          Fetching activejob 5.2.1
+          Installing activejob 5.2.1
+          Installing actionview 5.2.1
+          Fetching activerecord 5.2.1
+          Fetching actionpack 5.2.1
+          Installing actionpack 5.2.1
+          Installing activerecord 5.2.1
+          Fetching actionmailer 5.2.1
+          Fetching actioncable 5.2.1
+          Fetching railties 5.2.1
+          Installing actionmailer 5.2.1
+          Installing actioncable 5.2.1
+          Fetching sprockets-rails 3.2.1
+          Installing railties 5.2.1
+          Installing sprockets-rails 3.2.1
+          Fetching activestorage 5.2.1
+          Installing activestorage 5.2.1
+          Fetching coffee-rails 4.2.2
+          Fetching sass-rails 5.0.7
+          Fetching rails 5.2.1
+          Installing rails 5.2.1
+          Installing coffee-rails 4.2.2
+          Installing sass-rails 5.0.7
+          Bundle complete! 19 Gemfile dependencies, 64 gems now installed.
+          Gems in the groups development and test were not installed.
+          Bundled gems are installed into `/tmp/contents982664144/deps/0/vendor_bundle`
+          Post-install message from sass:
+          
+          Ruby Sass is deprecated and will be unmaintained as of 26 March 2019.
+          
+          * If you use Sass as a command-line tool, we recommend using Dart Sass, the new
+            primary implementation: https://sass-lang.com/install
+          
+          * If you use Sass as a plug-in for a Ruby web framework, we recommend using the
+            sassc gem: https://github.com/sass/sassc-ruby#readme
+          
+          * For more details, please refer to the Sass blog:
+            http://sass.logdown.com/posts/7081811
+          
+   -----> Regenerating bundler binstubs...
+          The dependency tzinfo-data (>= 0) will be unused by any of the platforms Bundler is installing for. Bundler is installing for ruby but the dependency is only for x86-mingw32, x86-mswin32, x64-mingw32, java. To add those platforms to the bundle, run `bundle lock --add-platform x86-mingw32 x86-mswin32 x64-mingw32 java`.
+          Cleaning up the bundler cache.
+          The dependency tzinfo-data (>= 0) will be unused by any of the platforms Bundler is installing for. Bundler is installing for ruby but the dependency is only for x86-mingw32, x86-mswin32, x64-mingw32, java. To add those platforms to the bundle, run `bundle lock --add-platform x86-mingw32 x86-mswin32 x64-mingw32 java`.
+   -----> Creating runtime environment
+   -----> Saving vendor_bundle to cache
+   -----> Finalizing Ruby
+   -----> Precompiling assets
+          Yarn executable was not detected in the system.
+          Download Yarn at https://yarnpkg.com/en/docs/install
+          I, [2019-03-01T08:51:59.422430 #4698]  INFO -- : Writing /tmp/app/public/assets/application-4850ef4d32dbc32d7b439b8e85c9a90c2bb78aea3cafa296f093261db9ff9749.js
+          I, [2019-03-01T08:51:59.422898 #4698]  INFO -- : Writing /tmp/app/public/assets/application-4850ef4d32dbc32d7b439b8e85c9a90c2bb78aea3cafa296f093261db9ff9749.js.gz
+          I, [2019-03-01T08:51:59.429010 #4698]  INFO -- : Writing /tmp/app/public/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css
+          I, [2019-03-01T08:51:59.429386 #4698]  INFO -- : Writing /tmp/app/public/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css.gz
+          Asset precompilation completed (5.019609411s)
+          Cleaning assets
+   -----> Copy binaries to app/bin directory
+   Exit status 0
+   Uploading droplet, build artifacts cache...
+   Uploading droplet...
+   Uploading build artifacts cache...
+   Uploaded build artifacts cache (60.1M)
+   Uploaded droplet (64.2M)
+   Uploading complete
+   Cell diego-cell-0 stopping instance 8d073823-3f5d-4b6e-9dbe-23e11314d8d3
+   Cell diego-cell-0 destroying container for instance 8d073823-3f5d-4b6e-9dbe-23e11314d8d3
+
+Waiting for app to start...
+
+name:              scf-rails-example
+requested state:   started
+routes:            scf-rails-example.52.186.13.127.xip.io
+last uploaded:     Fri 01 Mar 09:52:16 CET 2019
+stack:             sle12
+buildpacks:        ruby
+
+type:            web
+instances:       1/1
+memory usage:    256M
+start command:   bundle exec rake db:migrate && bundle exec rails s -p $PORT
+     state     since                  cpu     memory          disk           details
+#0   running   2019-03-01T08:52:40Z   28.9%   91.4M of 256M   256.5M of 1G   
+
+Populate the DB with sample data
+{:username=>"grokhyhv6q@e2d84541-37fc-494f-8fb9-45bfb8652faa", :password=>"TtyeqP2QTJZyRvO1", :database=>"wa8de7feq7", :host=>"e2d84541-37fc-494f-8fb9-45bfb8652faa.mysql.database.azure.com", :port=>3306, :adapter=>"mysql2", :encoding=>"utf8"}
+{:username=>"grokhyhv6q@e2d84541-37fc-494f-8fb9-45bfb8652faa", :password=>"TtyeqP2QTJZyRvO1", :database=>"wa8de7feq7", :host=>"e2d84541-37fc-494f-8fb9-45bfb8652faa.mysql.database.azure.com", :port=>3306, :adapter=>"mysql2", :encoding=>"utf8"}
+Getting apps in org testorg / space scftest as admin...
+OK
+
+name                requested state   instances   memory   disk   urls
+scf-rails-example   started           1/1         256M     1G     scf-rails-example.52.186.13.127.xip.io
+Getting services in org testorg / space scftest as admin...
+
+name                   service           plan    bound apps          last operation
+scf-rails-example-db   azure-mysql-5-7   basic   scf-rails-example   create succeeded
+Test the app
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ScfRailsExample</title>
+    <meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="LgcGvZTFxl3XNJDQwuJyCLt7c77ubv+nzqfhwTSRs1JO9kfeS0FzADvXeoqav9/MRctux+RbmwBh3RwMskhjaQ==" />
+    
+
+    <link rel="stylesheet" media="all" href="/assets/application-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.css" data-turbolinks-track="reload" />
+    <script src="/assets/application-4850ef4d32dbc32d7b439b8e85c9a90c2bb78aea3cafa296f093261db9ff9749.js" data-turbolinks-track="reload"></script>
+  </head>
+
+  <body>
+    <h1>Hello from Rails on SCF!</h1>
+2019-03-01T08:52:53+00:00
+
+<ul>
+  <li>#1: Drink coffee</li>
+  <li>#2: Go to work</li>
+  <li>#3: Have some rest</li>
+</ul>
+
+  </body>
+</html>
+Deploy Stratos SCF Console
+NAME:   susecf-console
+LAST DEPLOYED: Fri Mar  1 09:52:55 2019
+NAMESPACE: stratos
+STATUS: DEPLOYED
+
+RESOURCES:
+==> v1beta1/StatefulSet
+NAME     DESIRED  CURRENT  AGE
+stratos  1        1        0s
+
+==> v1/Pod(related)
+NAME                         READY  STATUS   RESTARTS  AGE
+stratos-db-69cd4469ff-7t96r  0/1    Pending  0         0s
+stratos-0                    0/3    Pending  0         0s
+
+==> v1/Secret
+NAME                           TYPE    DATA  AGE
+susecf-console-secret          Opaque  2     1s
+susecf-console-mariadb-secret  Opaque  2     1s
+
+==> v1/PersistentVolumeClaim
+NAME                                  STATUS   VOLUME   CAPACITY  ACCESS MODES  STORAGECLASS  AGE
+susecf-console-encryption-key-volume  Pending  default  1s
+console-mariadb                       Pending  default  1s
+susecf-console-upgrade-volume         Pending  default  1s
+
+==> v1/Service
+NAME                    TYPE          CLUSTER-IP   EXTERNAL-IP                                                PORT(S)         AGE
+susecf-console-mariadb  ClusterIP     10.0.31.189  <none>                                                     3306/TCP        1s
+susecf-console-ui-ext   LoadBalancer  10.0.214.23  52.186.13.127,10.240.0.7,10.240.0.6,10.240.0.5,10.240.0.4  8443:32305/TCP  1s
+
+==> v1beta1/Deployment
+NAME        DESIRED  CURRENT  UP-TO-DATE  AVAILABLE  AGE
+stratos-db  1        1        1           0          1s
+
+
+Wait for STRATOS pods to be ready
+Til 2 pods to wait for in stratos
+Til 2 pods to wait for in stratos
+Til 2 pods to wait for in stratos
+Til 2 pods to wait for in stratos
+Til 2 pods to wait for in stratos
+Til 2 pods to wait for in stratos
+Til 2 pods to wait for in stratos
+Til 1 pods to wait for in stratos
+Til 1 pods to wait for in stratos
+Til 1 pods to wait for in stratos
+Til 0 pods to wait for in stratos
+Deploy Metrics
+NAME:   scf-metrics
+LAST DEPLOYED: Fri Mar  1 09:56:46 2019
+NAMESPACE: metrics
+STATUS: DEPLOYED
+
+RESOURCES:
+==> v1/PersistentVolumeClaim
+NAME                               STATUS   VOLUME   CAPACITY  ACCESS MODES  STORAGECLASS  AGE
+scf-metrics-prometheus-prometheus  Pending  default  2s
+
+==> v1beta1/ClusterRole
+NAME                                       AGE
+scf-metrics-prometheus-kube-state-metrics  2s
+scf-metrics-prometheus-prometheus          2s
+
+==> v1beta1/Deployment
+NAME                                       DESIRED  CURRENT  UP-TO-DATE  AVAILABLE  AGE
+scf-metrics-prometheus-kube-state-metrics  1        1        1           0          1s
+scf-metrics-prometheus-prometheus          1        1        1           0          1s
+stratos-metrics-cfdevio                    1        1        1           0          1s
+
+==> v1/Service
+NAME                                       TYPE       CLUSTER-IP    EXTERNAL-IP                                                PORT(S)         AGE
+scf-metrics-prometheus-kube-state-metrics  ClusterIP  None          <none>                                                     80/TCP          2s
+scf-metrics-prometheus-prometheus          ClusterIP  10.0.175.130  <none>                                                     9090/TCP        1s
+scf-metrics-metrics-nginx                  NodePort   10.0.157.88   52.186.13.127,10.240.0.7,10.240.0.6,10.240.0.5,10.240.0.4  7443:30413/TCP  1s
+scf-metrics-f-exp-service                  ClusterIP  10.0.167.120  <none>                                                     9186/TCP        1s
+
+==> v1/Pod(related)
+NAME                                                       READY  STATUS             RESTARTS  AGE
+scf-metrics-prometheus-kube-state-metrics-7bcbb75bf-2wtl6  0/1    ContainerCreating  0         1s
+scf-metrics-prometheus-prometheus-7fb98f4d69-wb8d6         0/2    Pending            0         1s
+stratos-metrics-cfdevio-6977d9cf6f-8fkjs                   0/2    Init:0/1           0         1s
+
+==> v1/Secret
+NAME                   TYPE    DATA  AGE
+scf-metrics-nginx-tls  Opaque  2     2s
+
+==> v1/ConfigMap
+NAME                                DATA  AGE
+scf-metrics-stratos-metrics-config  3     2s
+
+==> v1/ServiceAccount
+NAME                                       SECRETS  AGE
+scf-metrics-prometheus-kube-state-metrics  1        2s
+scf-metrics-prometheus-node-exporter       1        2s
+scf-metrics-prometheus-prometheus          1        2s
+
+==> v1beta1/ClusterRoleBinding
+NAME                                       AGE
+scf-metrics-prometheus-kube-state-metrics  2s
+scf-metrics-prometheus-prometheus          2s
+
+
+Wait for METRICS pods to be ready
+Til 3 pods to wait for in metrics
+Til 2 pods to wait for in metrics
+Til 2 pods to wait for in metrics
+Til 1 pods to wait for in metrics
+Til 1 pods to wait for in metrics
+Til 1 pods to wait for in metrics
+Til 1 pods to wait for in metrics
+Til 0 pods to wait for in metrics
+Please enter your choice: 1
+jmlambert@linux:~/azure-cap/deploy-cap-aks-cluster-jml> 
+

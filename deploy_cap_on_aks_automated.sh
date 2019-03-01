@@ -111,9 +111,8 @@ do
 	echo "CF 1st Service"
 	    cf create-service azure-mysql-5-7 basic scf-rails-example-db -c "{ \"location\": \"${REGION}\", \"resourceGroup\": \"${SBRGNAME}\", \"firewallRules\": [{\"name\": \"AllowAll\", \"startIPAddress\":\"0.0.0.0\",\"endIPAddress\":\"255.255.255.255\"}]}";
 	echo "Wait for SCF 1st Service to be ready"
-	    watch -n10 cf service scf-rails-example-db ;
         PODSTATUS="progress" ;
-        while [ $PODSTATUS -ne "succeeded" ]; do
+        while [ $PODSTATUS != "succeeded" ]; do
           sleep 20 ;
           PODSTATUS=$(cf services|awk '/scf-rails/{print $NF}');
           echo "Status $PODSTATUS for db service";
