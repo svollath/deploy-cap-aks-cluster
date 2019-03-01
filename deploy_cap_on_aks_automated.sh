@@ -22,7 +22,7 @@ do
         "Review scfConfig")
              vim $AKSDEPLOYID/scf-config-values.yaml
 	     ;;
-	"Deploy APP All Steps")
+	"Deploy CAP All Steps")
 	echo  "Deploying UAA"
              helm install suse/uaa --name susecf-uaa --namespace uaa --values $AKSDEPLOYID/scf-config-values.yaml
         echo "Wait for UAA pods to be ready"

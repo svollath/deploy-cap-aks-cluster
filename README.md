@@ -19,7 +19,12 @@ These scripts are for internal use, as they rely on some fixed presets.
 7) Deploy CATALOG		  15) CF 1st Service		    23) Pods Metrics
 8) Pods CATALOG			  16) CF 1st Service Status
 ```
-
+* Added the full automated for unattended install of CAP/AKS new script `deploy_cap_on_aks_automated.sh` instead of the full menu
+```bash
+1) Quit
+2) Review scfConfig
+3) Deploy CAP All Steps
+```
 # Prerequisites
 
 The scripts are based on the steps from our official [Documentation](https://www.suse.com/documentation/cloud-application-platform-1/book_cap_deployment/data/cha_cap_depl-azure.html).
@@ -85,7 +90,7 @@ source init_aks_env.sh
 ```
 * you may review/edit/modify the `scf-config-values.yaml` file that is generated in the `$AKSDEPLOYID/scf-config-values.yaml` 
 
-Now you may launch the menu driven steps for deploying CAP on the cluster just deployed.
+OPTION1: Now you may launch the menu driven steps for deploying CAP on the cluster just deployed.
 ```bash
 ./deploy_cap_on_aks_by_step.sh
 ```
@@ -112,6 +117,21 @@ NOTE : If you QUIT and come back, the script recovers the ENVVARs that are requi
 * 20 will deploy the CF dashboard (Stratos)
 * 21 will deploy the metrics (monitoring) that you will connect then to the stratos GUI.
 
+OPTION2 : Now you may launch all steps in an unattended with with the following :
+```bash
+./deploy_cap_on_aks_automated.sh
+```
+* You will get the menu :
+```bash
+1) Quit
+2) Review scfConfig
+3) Deploy APP All Steps
+```
+* 2 Review SCFConfig let you edit the `scf-config-values.yaml` again
+* 3 Deploy all steps one after one in the right order.(unattended deployment).
+*
+
+ALLCASES: 
 when you are there, you have done a great story, and you can start to play efficiently with SCF.
 * To Connect the Kubernetes API & the metrics API, go to the Stratos GUI, and in EndPoint, select the one.
 * for Kubernetes 
