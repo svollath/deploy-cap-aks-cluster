@@ -12,7 +12,7 @@ export KUBECONFIG="$AKSDEPLOYID/kubeconfig"
 echo "export KUBECONFIG=$KUBECONFIG" >>$AKSDEPLOYID/.envvar.sh;
 PS3='Please enter your choice: '
 set -e
-options=("Quit" "Review scfConfig" "Deploy APP All Steps")
+options=("Quit" "Review scfConfig" "Deploy CAP All Steps")
 select opt in "${options[@]}"
 do
     case $opt in
