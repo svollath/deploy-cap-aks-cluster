@@ -16,7 +16,9 @@ options=("Quit" "Review scfConfig" "Deploy UAA" "Pods UAA" \
  "Deploy SCF" "Pods SCF" "Deploy CATALOG" "Pods CATALOG" \
 "Create Azure SB" "Deploy OSBA" "Pods OSBA" "CF API set" \
 "CF Add SB" "CF CreateOrgSpace" "CF 1st Service" \
-"CF 1st Service Status" "AZ List Mysql DBs to Disable" "AZ Disable SSL Mysql DBs" "Deploy 1st Rails Appl" "Deploy Stratos SCF Console" "Pods Stratos" "Deploy Metrics" "Pods Metrics")
+"CF 1st Service Status" "AZ List Mysql DBs to Disable" "AZ Disable SSL Mysql DBs" "Deploy 1st Rails Appl" \
+"Deploy Stratos SCF Console" "Pods Stratos" "Deploy Metrics" "Pods Metrics" \
+"CF 1st mongoDB Service" "CF 1st mongoDB Service Status" "Deploy 2nd App Nodejs")
 select opt in "${options[@]}"
 do
     case $opt in
@@ -143,6 +145,27 @@ do
 	"Pods Metrics")
 	    watch kubectl get pods -n metrics
 	    ;;
+        "CF 1st mongoDB Service")
+	    cf create-service azure-cosmosdb-mongo-account account scf-mongo-db -c "{ \"location\": \"${REGION}\", \"resourceGroup\": \"${SBRGNAME}\"}"
+            ;;
+        "CF 1st mongoDB Service Status")
+            watch -n10 cf service scf-mongo-db ;
+	    ;;
+        "Deploy 2nd App Nodejs")
+            echo "Clone the nodejs application to consume mongodb db"
+            git clone https://github.com/jmlambert78/node-backbone-mongo $AKSDEPLOYID/nodejs-example
+            cd $AKSDEPLOYID/nodejs-example
+            echo "Push the application to SCF"
+            cf push
+	    cf bind-service node-backbone-mongo scf-mongo-db
+	    cf restage node-backbone-mongo
+            cd ../..
+            cf apps
+            cf services
+            echo "Test the app"
+            cf apps|awk '/node-backbone-mongo/{print "curl " $NF }'|sh
+            ;;
+ 
         *) echo "invalid option $REPLY";;
     esac
 done
