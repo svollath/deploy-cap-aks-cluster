@@ -1,9 +1,11 @@
 #!/bin/bash
 
-set -e
-set -u
-
 conffile="./example.conf"
+compatfile="./.compatibility.conf"
+
+CONSOLE_NAMESPACE=startos
+CONSOLE_SERVICE_IP=console-ui
+CONSOLE_SERVICES="$(echo $CONSOLE_SERVICE_IP)"
 
 usage() {
   echo -e  "\n $0 [-c <config>] Default config is \"$conffile\" \n"
@@ -21,16 +23,14 @@ done
 
 if [ -e $conffile ]; then
    . $conffile
-   export AZ_SUB_DOMAIN
+   . $compatfile
+   export AZ_DNS_SUB_DOMAIN
+   export AZ_DNS_RESOURCE_GROUP
+   export AZ_DNS_ZONE_NAME
   else
    echo -e "Error: Can't find config file: \"$conffile\""
    exit 1
 fi
-
-ZONE_NAME=susecap.net
-DNS_RESOURCE_GROUP=susecap-domain
-
-SUBDOMAIN=$AZ_SUB_DOMAIN
 
 wait_for_lb() {
   svc_name=$1-ext
@@ -40,9 +40,7 @@ wait_for_lb() {
 
 
   # This can fail if the jsonpath isn't available, or be empty when it's not ready yet
-  set +e
-  status=$(kubectl --namespace stratos get svc "${svc_name}" -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2> /dev/null)
-  set -e
+  status=$(kubectl --namespace $CONSOLE_NAMESPACE get svc "${svc_name}" -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2> /dev/null)
   
   while [ -z "${status}" ]
   do
@@ -57,68 +55,73 @@ wait_for_lb() {
     fi
 
     set +e
-    status=$(kubectl --namespace stratos get svc "${svc_name}" -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2> /dev/null)
+    status=$(kubectl --namespace $CONSOLE_NAMESPACE get svc "${svc_name}" -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2> /dev/null)
     set -e
   done
 
   return ${result}
 }
 
+# Get current records
+AZ_DNS_ZONE_RECORDS=$(az network dns record-set a list --resource-group $AZ_DNS_RESOURCE_GROUP --zone-name $AZ_DNS_ZONE_NAME | jq .[].name -r | paste -s -d " ")
+
 get_lb() {
   svc_name=$1-ext
-  kubectl --namespace stratos \
+  kubectl --namespace $CONSOLE_NAMESPACE \
 	  get svc "${svc_name}" \
 	  -o jsonpath='{.status.loadBalancer.ingress[0].ip}' \
 	  2> /dev/null
 }
 
-# Gets the IP of the record $1.${ZONE_NAME}
+# Gets the IP of the record $1.${AZ_DNS_ZONE_NAME}
 get_ip() {
 	record_name=$1
 
 	az network dns record-set a show \
-		--resource-group ${DNS_RESOURCE_GROUP} \
-		--zone-name ${ZONE_NAME} \
+		--resource-group ${AZ_DNS_RESOURCE_GROUP} \
+		--zone-name ${AZ_DNS_ZONE_NAME} \
 		--name "${record_name}" \
-		| jq .arecords[0].ipv4Address -r 2>&1> /dev/null
+		| jq .arecords[0].ipv4Address -r
 }
 
-# Clears the IP of the record $1.${ZONE_NAME}
+# Clears the IP of the record $1.${AZ_DNS_ZONE_NAME}
 clear_ip() {
 	record_name=$1
 
-	echo -e "Cleaning current setting for: $record_name \n"
-
-	old_ip=$(get_ip "${record_name}")
-
-	az network dns record-set a remove-record \
-		--resource-group ${DNS_RESOURCE_GROUP} \
-		--zone-name ${ZONE_NAME} \
-		--record-set-name "${record_name}" \
-		--keep-empty-record-set \
-		--ipv4-address "${old_ip}" 2>&1> /dev/null
+        if [ $(echo $AZ_DNS_ZONE_RECORDS | grep -o " $(echo $record_name | sed -e 's/\*/\\\*/g') ") ]; then
+           old_ip=$(get_ip "${record_name}")
+       
+           if [ "$old_ip" != "null" ]; then
+	      az network dns record-set a remove-record \
+	   	   --resource-group ${AZ_DNS_RESOURCE_GROUP} \
+		   --zone-name ${AZ_DNS_ZONE_NAME} \
+		   --record-set-name "${record_name}" \
+		   --keep-empty-record-set \
+		   --ipv4-address "${old_ip}" 2>&1> /dev/null
+           fi
+        fi
 }
 
-# Sets the IP of the record $1.${ZONE_NAME}
+# Sets the IP of the record $1.${AZ_DNS_ZONE_NAME}
 set_ip() {	
   record_name=$1
   new_ip=$2
 
-  echo -e "Setting DNS entry for: $record_name \n"
-
   az network dns record-set a add-record \
-	  --resource-group ${DNS_RESOURCE_GROUP} \
-	  --zone-name ${ZONE_NAME} \
+	  --resource-group ${AZ_DNS_RESOURCE_GROUP} \
+	  --zone-name ${AZ_DNS_ZONE_NAME} \
 	  --record-set-name "${record_name}" \
 	  --ipv4-address "${new_ip}" 2>&1> /dev/null
+
+  echo -e "Setting DNS entry for: $record_name \n"
 }
 
-wait_for_lb console-ui
+for service in $(echo $CONSOLE_SERVICES); do
+    wait_for_lb $service
+done
 
-set +e
-clear_ip "console.${SUBDOMAIN}"
-set -e
+clear_ip "console.${AZ_DNS_SUB_DOMAIN}"
 
-CONSOLE_IP="$(get_lb console-ui)"
+CONSOLE_IP="$(get_lb $CONSOLE_SERVICE_IP)"
 
-set_ip "console.${SUBDOMAIN}" "${CONSOLE_IP}"
+set_ip "console.${AZ_DNS_SUB_DOMAIN}" "${CONSOLE_IP}"

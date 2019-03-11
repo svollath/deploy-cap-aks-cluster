@@ -2,10 +2,10 @@
 
 secrets:
   # Password for user 'admin' in the cluster
-  CLUSTER_ADMIN_PASSWORD: password
+  CLUSTER_ADMIN_PASSWORD: uaapassword
 
   # Password for SCF to authenticate with UAA
-  UAA_ADMIN_CLIENT_SECRET: password
+  UAA_ADMIN_CLIENT_SECRET: uaapassword
 
 env:
   # Use the public IP address
@@ -23,18 +23,13 @@ kube:
   external_ips: <extip> 
   storage_class:
     # Azure supports only "default" or "managed-premium"
-    persistent: "default"
+    persistent: "capakssc"
     shared: "shared"
-    
   registry:
     hostname: "registry.suse.com"
     username: ""
     password: ""
   organization: "cap"
-  auth: "rbac"
-  psp:
-    nonprivileged: "suse.cap.psp"
-    privileged: "suse.cap.psp"
 
 services:
   loadbalanced: true

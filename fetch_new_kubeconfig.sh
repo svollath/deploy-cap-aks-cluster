@@ -9,7 +9,6 @@
 set -o errexit
 
 conffile="./example.conf"
-mode=default
 
 usage() {
   echo -e  "\n $0 [-c <config>] Default config is \"$conffile\" \n"

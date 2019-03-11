@@ -1,9 +1,11 @@
-#!/bin/bash 
-
-set -e
-set -u
+#!/bin/bash
 
 conffile="./example.conf"
+compatfile="./.compatibility.conf"
+
+UAA_NAMESPACE=uaa
+UAA_SERVICE_IP=uaa-uaa
+UAA_SERVICES="$(echo $UAA_SERVICE_IP)"
 
 usage() {
   echo -e  "\n $0 [-c <config>] Default config is \"$conffile\" \n"
@@ -21,26 +23,30 @@ done
 
 if [ -e $conffile ]; then
    . $conffile
-   export AZ_SUB_DOMAIN
+   . $compatfile
+   export AZ_DNS_SUB_DOMAIN
+   export AZ_DNS_RESOURCE_GROUP
+   export AZ_DNS_ZONE_NAME
   else
    echo -e "Error: Can't find config file: \"$conffile\""
    exit 1
 fi
 
-ZONE_NAME=susecap.net
-DNS_RESOURCE_GROUP=susecap-domain
+# Get current records
+AZ_DNS_ZONE_RECORDS=$(az network dns record-set a list --resource-group $AZ_DNS_RESOURCE_GROUP --zone-name $AZ_DNS_ZONE_NAME | jq .[].name -r | paste -s -d " ")
 
-SUBDOMAIN=$AZ_SUB_DOMAIN
 
-wait_for_uaa_lb() {
+wait_for_lb() {
+  svc_name=$1-public
+  
   count=0
   result=0
 
   # This can fail if the jsonpath isn't available, or be empty when it's not ready yet
-  set +e
-  status=$(kubectl --namespace uaa get svc uaa-uaa-public -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2> /dev/null)
-  set -e
+  status=$(kubectl --namespace $UAA_NAMESPACE get svc "${svc_name}" -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2> /dev/null)
   
+  echo -e "Waiting for service: ${svc_name}"
+
   while [ -z "${status}" ]
   do
     sleep 30
@@ -49,54 +55,77 @@ wait_for_uaa_lb() {
     if [ ${count} -gt 10 ]
     then
       result=1
-      echo "Failed to get load balancer IP" >&2
+      echo "Failed to get load balancer IP for ${svc_name}" >&2
       break
     fi
-    
+
     set +e
-    status=$(kubectl --namespace uaa get svc uaa-uaa-public -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2> /dev/null)
+    status=$(kubectl --namespace $UAA_NAMESPACE get svc "${svc_name}" -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2> /dev/null)
     set -e
   done
 
   return ${result}
 }
 
-get_uaa_lb() {
-  kubectl --namespace uaa get svc uaa-uaa-public -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2> /dev/null
+get_lb() {
+  svc_name=$1-public
+  kubectl --namespace $UAA_NAMESPACE \
+	  get svc "${svc_name}" \
+	  -o jsonpath='{.status.loadBalancer.ingress[0].ip}' \
+	  2> /dev/null
 }
 
-wait_for_uaa_lb
+# Gets the IP of the record $1.${AZ_DNS_ZONE_NAME}
+get_ip() {
+	record_name=$1
 
-NEW_UAA_IP=$(get_uaa_lb)
-OLD_UAA_IP=$(az network dns record-set a show --resource-group susecap-domain --zone-name susecap.net --name uaa.${SUBDOMAIN} | jq .arecords[0].ipv4Address -r)
+	az network dns record-set a show \
+		--resource-group ${AZ_DNS_RESOURCE_GROUP} \
+		--zone-name ${AZ_DNS_ZONE_NAME} \
+		--name "${record_name}" \
+		| jq .arecords[0].ipv4Address -r
+}
 
-echo -e "Replacing current setting: ${OLD_UAA_IP} \n"
+# Clears the IP of the record $1.${AZ_DNS_ZONE_NAME}
+clear_ip() {
+	record_name=$1
 
-set +e
-az network dns record-set a remove-record \
-	--resource-group ${DNS_RESOURCE_GROUP} \
-	--zone-name ${ZONE_NAME} \
-	--record-set-name uaa.${SUBDOMAIN} \
-	--keep-empty-record-set \
-	--ipv4-address "${OLD_UAA_IP}" 2>&1> /dev/null
+        if [ $(echo $AZ_DNS_ZONE_RECORDS | grep -o " $(echo $record_name | sed -e 's/\*/\\\*/g') ") ]; then
+           old_ip=$(get_ip "${record_name}")
+       
+           if [ "$old_ip" != "null" ]; then
+	      az network dns record-set a remove-record \
+	   	   --resource-group ${AZ_DNS_RESOURCE_GROUP} \
+		   --zone-name ${AZ_DNS_ZONE_NAME} \
+		   --record-set-name "${record_name}" \
+		   --keep-empty-record-set \
+		   --ipv4-address "${old_ip}" 2>&1> /dev/null
+           fi
+        fi
+}
 
-az network dns record-set a remove-record \
-	--resource-group ${DNS_RESOURCE_GROUP} \
-	--zone-name ${ZONE_NAME} \
-	--record-set-name "*.uaa.${SUBDOMAIN}" \
-	--keep-empty-record-set \
-	--ipv4-address "${OLD_UAA_IP}" 2>&1> /dev/null
-set -e
-az network dns record-set a add-record \
-	--resource-group ${DNS_RESOURCE_GROUP} \
-	--zone-name ${ZONE_NAME} \
-	--record-set-name uaa.${SUBDOMAIN} \
-	--ipv4-address "${NEW_UAA_IP}" 2>&1> /dev/null
+# Sets the IP of the record $1.${AZ_DNS_ZONE_NAME}
+set_ip() {	
+  record_name=$1
+  new_ip=$2
 
-az network dns record-set a add-record \
-	--resource-group ${DNS_RESOURCE_GROUP} \
-	--zone-name ${ZONE_NAME} \
-	--record-set-name "*.uaa.${SUBDOMAIN}" \
-	--ipv4-address "${NEW_UAA_IP}" 2>&1> /dev/null
+  az network dns record-set a add-record \
+	  --resource-group ${AZ_DNS_RESOURCE_GROUP} \
+	  --zone-name ${AZ_DNS_ZONE_NAME} \
+	  --record-set-name "${record_name}" \
+	  --ipv4-address "${new_ip}" 2>&1> /dev/null
 
-echo -e "Set UAA related DNS entries to: ${NEW_UAA_IP} \n"
+  echo -e "Setting DNS entry for: $record_name to ${new_ip}"
+}
+
+for service in $(echo $UAA_SERVICES); do
+    wait_for_lb $service
+done
+
+clear_ip "uaa.${AZ_DNS_SUB_DOMAIN}"
+clear_ip "*.uaa.${AZ_DNS_SUB_DOMAIN}"
+
+UAA_IP="$(get_lb $UAA_SERVICE_IP)"
+
+set_ip "uaa.${AZ_DNS_SUB_DOMAIN}" "${UAA_IP}"
+set_ip "*.uaa.${AZ_DNS_SUB_DOMAIN}" "${UAA_IP}"
