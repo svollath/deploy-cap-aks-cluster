@@ -2,10 +2,10 @@
 
 secrets:
   # Password for user 'admin' in the cluster
-  CLUSTER_ADMIN_PASSWORD: password
+  CLUSTER_ADMIN_PASSWORD: <password>
 
   # Password for SCF to authenticate with UAA
-  UAA_ADMIN_CLIENT_SECRET: password
+  UAA_ADMIN_CLIENT_SECRET: <password>
 
 env:
   # Use the public IP address
@@ -38,3 +38,22 @@ kube:
 
 services:
   loadbalanced: true
+kubernetes:
+ authEndpoint: https://<fqdn>:443
+prometheus:
+  kubeStateMetrics:
+    enabled: true
+nginx:
+  username: admin
+  password: <password>
+firehoseExporter:
+  dopplerUrl: wss://doppler.<domain>:4443)
+  uaa:
+    endpoint: uaa.<domain>:2793
+    skipSslVerification: "true"
+    cfIdentityZone: cf
+    admin:
+      client: admin
+      clientSecret: <password>
+
+  
