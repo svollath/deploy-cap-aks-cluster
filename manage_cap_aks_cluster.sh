@@ -1,9 +1,23 @@
 #!/bin/bash
 
+#  Tested with Azure AKS (Kubernetes v1.11.8) and CAP-1.3.1 (2.15.2)
+#  * Tools kubectl (1.10.11+), helm (2.8.2+), azure-cli (2.0.60+) are expected, as well as jq.
+#  The script is run on a machine with working az cli, it will use the current directory as working directory.
+
 set -o errexit
 
 conffile="./example.conf"
+
+#Parse arguments the ugly way
 cmd=$(echo $@ | sed -r 's/(-c )[^ ]+ //' | grep -m1 -o -e start -e stop | head -n 1)
+if echo $@ | grep -e 'start.*.-' -e 'stop.*.-' &>/dev/null; then
+   OPTIND=2
+fi
+case $cmd in
+  start) mode=start;;
+  stop)  mode=stop;;
+  *)     mode=status;;
+esac
 
 usage() {
   echo -e  "\n $0 [-c <config>] Default config is \"$conffile\" \n"
@@ -19,12 +33,6 @@ while getopts ":c:h" Option
   esac
 done
 
-case $cmd in
-  start) mode=start;;
-  stop)  mode=stop;;
-  *)     mode=status;;
-esac
-
 if [ -e $conffile ]; then
    . $conffile
    export AZ_RG_NAME
@@ -39,7 +47,7 @@ export AZ_AKS_VMNODES=$(az vm list --resource-group $AZ_MC_RG_NAME -o json | jq 
 
 if [ "$mode" != "status" ]; then
    for i in $AZ_AKS_VMNODES; do
-      az vm $mode -g $AZ_MC_RG_NAME -n $i 2>&1> /dev/null
+      az vm $mode -g $AZ_MC_RG_NAME -n $i &> /dev/null
    done
 fi
 

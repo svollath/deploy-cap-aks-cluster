@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#  Tested with Azure AKS (Kubernetes v1.11.8) and CAP-1.3.1 (2.15.2)
+#  * Tools kubectl (1.10.11+), helm (2.8.2+), azure-cli (2.0.60+) are expected, as well as jq.
+#  The script is run on a machine with working az cli, it will use the current directory as working directory.
+
 set -o errexit
 
 conffile="./example.conf"
@@ -34,5 +38,5 @@ echo -e "Deleted resource group \"$AZ_RG_NAME\"\n"
 
 case $AZ_LOAD_BALANCER in
   kube)  echo -e "You might want to cleanup DNS records for \"$AZ_DNS_SUB_DOMAIN\"\n \
-run \"./cleanup-all-dns.sh -c $conffile\"\n\n";;
+run \"./dns-cleanup-all.sh -c $conffile\"\n\n";;
 esac

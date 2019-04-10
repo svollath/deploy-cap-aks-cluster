@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #  Tested with Azure AKS (Kubernetes v1.11.8) and CAP-1.3.1 (2.15.2)
-#  * Tools kubectl (1.9.8+), helm (2.8.2+), azure-cli (2.0.51+) are expected, as well as jq.
+#  * Tools kubectl (1.10.11+), helm (2.8.2+), azure-cli (2.0.60+) are expected, as well as jq.
 #  The script is run on a machine with working az cli, it will use the current directory as working directory.
-#  See https://www.suse.com/documentation/cloud-application-platform-1/book_cap_deployment/data/cha_cap_depl-azure.html
+#  See https://www.suse.com/documentation/cloud-application-platform-1/book_cap_guides/data/cha_cap_depl-azure.html
 #  Script starts from "Create Resource Group and AKS Instance" on
 
 set -o errexit
@@ -81,7 +81,7 @@ cat $conffile | sed -e 's/#.*$//' -e '/^$/d' >> $logfile
 
 echo -e "\nStarting deployment \"$deploymentid\" with \"$conffile\"\nLogfile: $logfile" | tee -a $logfile
 
-az group create --name $AZ_RG_NAME --location $AZ_REGION 2>&1>> $logfile
+az group create --name $AZ_RG_NAME --location $AZ_REGION &>> $logfile
 echo -e "Created resource group: $AZ_RG_NAME"
 
 az aks create --resource-group $AZ_RG_NAME --name $AZ_AKS_NAME \
@@ -97,7 +97,7 @@ echo -e "Azure VM type: $AZ_AKS_NODE_VM_SIZE, Premium Storage: $AZ_PREMIUMIO" | 
 
 # Fetch kubeconfig
 export KUBECONFIG=$deploymentid/kubeconfig
-while ! az aks get-credentials --admin --resource-group $AZ_RG_NAME --name $AZ_AKS_NAME --file $KUBECONFIG 2>&1>> $logfile; do
+while ! az aks get-credentials --admin --resource-group $AZ_RG_NAME --name $AZ_AKS_NAME --file $KUBECONFIG &>> $logfile; do
   sleep 10
 done
 echo -e "Fetched kubeconfig"
@@ -117,8 +117,8 @@ export AZ_AKS_VMNODES=$(az vm list --resource-group $AZ_MC_RG_NAME -o json | jq 
 for i in $AZ_AKS_VMNODES; do
    az vm run-command invoke -g $AZ_MC_RG_NAME -n $i --command-id RunShellScript --scripts \
    "sudo sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=)\"(.*.)\"|\1\"\2 swapaccount=1\"|' \
-   /etc/default/grub.d/50-cloudimg-settings.cfg && sudo update-grub" 2>&1>> $logfile
-   az vm restart -g $AZ_MC_RG_NAME -n $i 2>&1>> $logfile
+   /etc/default/grub.d/50-cloudimg-settings.cfg && sudo update-grub" &>> $logfile
+   az vm restart -g $AZ_MC_RG_NAME -n $i &>> $logfile
    echo -e "Set swapaccount=1 on: $i"
 done
 
@@ -145,9 +145,9 @@ for i in $AZ_AKS_VMNODES; do
 done
 
 # Create service account and update tiller
-kubectl create serviceaccount tiller --namespace kube-system 2>&1>> $logfile
-kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller 2>&1>> $logfile
-helm init --upgrade --service-account tiller 2>&1>> $logfile
+kubectl create serviceaccount tiller --namespace kube-system &>> $logfile
+kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller &>> $logfile
+helm init --upgrade --service-account tiller &>> $logfile
 echo -e "Initialized helm for AKS"
 
 if [ "$mode" = "loadbalanced" ]; then
@@ -159,14 +159,14 @@ if [ "$mode" = "manual" ]; then
    az network public-ip create \
      --resource-group $AZ_MC_RG_NAME \
      --name $AZ_AKS_NAME-public-ip \
-     --allocation-method Static 2>&1>> $logfile
+     --allocation-method Static &>> $logfile
 
    az network lb create \
      --resource-group $AZ_MC_RG_NAME \
      --name $AZ_AKS_NAME-lb \
      --public-ip-address $AZ_AKS_NAME-public-ip \
      --frontend-ip-name $AZ_AKS_NAME-lb-front \
-     --backend-pool-name $AZ_AKS_NAME-lb-back 2>&1>> $logfile
+     --backend-pool-name $AZ_AKS_NAME-lb-back &>> $logfile
 
    export AZ_NIC_NAMES=$(az network nic list --resource-group $AZ_MC_RG_NAME | jq -r '.[].name')
    for i in $AZ_NIC_NAMES; do
@@ -175,7 +175,7 @@ if [ "$mode" = "manual" ]; then
        --nic-name $i \
        --ip-config-name ipconfig1 \
        --lb-name $AZ_AKS_NAME-lb \
-       --address-pool $AZ_AKS_NAME-lb-back 2>&1>> $logfile
+       --address-pool $AZ_AKS_NAME-lb-back &>> $logfile
    done
    echo -e "Created LoadBalancer (azure)"
 
@@ -185,7 +185,7 @@ if [ "$mode" = "manual" ]; then
        --lb-name $AZ_AKS_NAME-lb \
        --name probe-$i \
        --protocol tcp \
-       --port $i 2>&1>> $logfile
+       --port $i &>> $logfile
     
      az network lb rule create \
        --resource-group $AZ_MC_RG_NAME \
@@ -196,7 +196,7 @@ if [ "$mode" = "manual" ]; then
        --backend-pool-name $AZ_AKS_NAME-lb-back \
        --frontend-port $i \
        --backend-port $i \
-       --probe probe-$i 2>&1>> $logfile
+       --probe probe-$i &>> $logfile
    done
    echo -e "Created LoadBalancer rules for ports: $(echo $CAP_PORTS | sed 's| |, |g')"
 
@@ -212,7 +212,7 @@ if [ "$mode" = "manual" ]; then
        --name $AZ_AKS_NAME-$i \
        --direction Inbound \
        --destination-port-ranges $i \
-       --access Allow 2>&1>> $logfile
+       --access Allow &>> $logfile
      export AZ_NSG_PRI=$(expr $AZ_NSG_PRI + 1)
    done
    echo -e "Created network security group"
@@ -242,7 +242,8 @@ if [ "$mode" = "manual" ]; then
 Private IPs (external_ips for CAP):\t$extip\n \
 Suggested DOMAIN for CAP: \t\t\"$domain\"\n \
 Using storage class: $CAP_AKS_STORAGECLASS \n\n\
-Values file written to: $deploymentid/scf-config-values.yaml \n\n \
+Values file written to: $deploymentid/scf-config-values.yaml \n \
+Run e.g. \"export KUBECONFIG=$PWD/$deploymentid/kubeconfig\" \n\n\
 You need to:\n \
 Deploy UAA, SCF and Stratos (optionally)\n" | tee -a $logfile
 fi
@@ -258,12 +259,13 @@ if [ "$mode" = "loadbalanced" ]; then
       -e 's/capakssc/'$CAP_AKS_STORAGECLASS'/g' > $deploymentid/scf-config-values.yaml
    echo -e " Suggested DOMAIN for CAP: \"$domain\"\n \
 Configuration: \"services.loadbalanced=\"true\"\"\n \
-Storage class: $CAP_AKS_STORAGECLASS \n\n\
-Values file written to: $deploymentid/scf-config-values.yaml \n\n \
+Using storage class: $CAP_AKS_STORAGECLASS \n\n\
+Values file written to: $deploymentid/scf-config-values.yaml \n \
+Run e.g. \"export KUBECONFIG=$PWD/$deploymentid/kubeconfig\" \n\n\
 You need to:\n \
 1. Deploy UAA\n \
-2. Run \"setup-uaa-dns.sh -c $conffile\"\n \
+2. Run \"./dns-setup-uaa.sh -c $conffile\"\n \
 3. Deploy SCF\n \
-4. Run \"setup-scf-dns.sh -c $conffile\"\n \
-5. Optionally continue with Stratos UI, and \"setup-console-dns.sh -c $conffile\"\n" | tee -a $logfile
+4. Run \"./dns-setup-scf.sh -c $conffile\"\n \
+5. Optionally continue with Stratos UI, and \"./dns-setup-console.sh -c $conffile\"\n" | tee -a $logfile
 fi
