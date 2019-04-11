@@ -2,10 +2,11 @@ Scripts to deploy and manage CAP ready Azure AKS clusters (using azure-cli, az).
 These scripts are for internal use, as they rely on some fixed presets.
 
 * Handle configuration files for various test/demo clusters on AKS
-* Deploy Azure AKS clusters with Azure or Kubernetes LoadBalancer
+* Deploy Azure AKS clusters
 * Get preconfigured scf-config-values.yaml files
 * Stop/start your clusters (VMs) by pointing to the config file
 * Delete clusters by pointing to the config file
+* Manage Azure DNS entries
 
 
 # Prerequisites
@@ -52,10 +53,9 @@ E.g. run
 
 ## Deploy with Kuberbetes Service LoadBalanced
 
-By default (from CAP-1.3.1 on), kubernetes LoadBalanced service will create public IPs automatically.
+By default (from CAP-1.3.1 on), kubernetes LoadBalanced service will create public IPs automatically when you deploy CAP via helm later on.
 You need to set a subdomain in the configuration file, that will be used for the "susecap.net" domain. E.g. "test3" will configure and suggest the domain "test3.susecap.net".
-
-You will then use the e.g. `dns-setup-*.sh -c test3.conf` scripts to automatically create or update DNS entries for susecap.net based on the extracted IPs.
+Later you will then use the e.g. `dns-setup-*.sh -c test3.conf` scripts after each "helm install" to automatically create or update DNS entries.
 
 Depending on network conditions the script will run approx. 20-30 min.
 
@@ -66,7 +66,7 @@ Logfile: CAP-AKS-2019-04-10_16h05_test3/deployment.log
 Created resource group: test3-cap-aks
 Created AKS cluster: test3 in MC_test3-cap-aks_test3_westeurope
 Orchestrator: Kubernetes 1.11.8
-Azure VM type: Standard_DS3_v2, Premium Storage: True
+Azure VM type: Standard_DS4v2, Premium Storage: True
 Fetched kubeconfig
 Set swapaccount=1 on: aks-test3-37306405-0
 Set swapaccount=1 on: aks-test3-37306405-1
@@ -78,13 +78,13 @@ Initialized helm for AKS
 Using Kubernetes LoadBalancer Service
 
 Kubeconfig file is stored to: "CAP-AKS-2019-04-10_16h05_test3/kubeconfig"
+Run e.g. "export KUBECONFIG=<path>/CAP-AKS-2019-04-10_16h05_test3/kubeconfig" to use it
+
+Values file written to: CAP-AKS-2019-04-10_16h05_test3/scf-config-values.yaml
 
  Suggested DOMAIN for CAP: "test3.susecap.net"
  Configuration: "services.loadbalanced="true""
- Using storage class: managed-premium
-
-Values file written to: CAP-AKS-2019-04-10_16h05_test3/scf-config-values.yaml
- Run e.g. "export KUBECONFIG=<path>/CAP-AKS-2019-04-10_16h05_test3/kubeconfig"
+ Using storage class: "managed-premium"
 
 You need to:
  1. Deploy UAA
