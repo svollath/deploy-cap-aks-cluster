@@ -18,7 +18,8 @@ case $cmd in
 esac
 
 usage() {
-  echo -e  "\n $0 [-c <config>] Default config is \"$conffile\" \n"
+  echo -e "\n $0 [-c <config>] Default config is \"$conffile\""
+  echo -e " $0 [-c <config>] [rm] Also remove all subdomain related entries\n"
 }
 
 while getopts ":c:h" Option

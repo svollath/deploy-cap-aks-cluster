@@ -10,7 +10,7 @@ conffile="./example.conf"
 
 #Parse arguments the ugly way
 cmd=$(echo $@ | sed -r 's/(-c )[^ ]+ //' | grep -m1 -o -e start -e stop | head -n 1)
-if echo $@ | grep -e 'start.*.-' -e 'stop.*.-' &>/dev/null; then
+if echo $@ | grep -e 'start.*.-' -e 'stop.*.-' -e 'status.*.-' &>/dev/null; then
    OPTIND=2
 fi
 case $cmd in
@@ -20,7 +20,8 @@ case $cmd in
 esac
 
 usage() {
-  echo -e  "\n $0 [-c <config>] Default config is \"$conffile\" \n"
+  echo -e "\n $0 [-c <config>] Default config is \"$conffile\""
+  echo -e " $0 [-c <config>] [start|stop|status]\n"
 }
 
 while getopts ":c:h" Option
