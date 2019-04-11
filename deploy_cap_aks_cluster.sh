@@ -223,7 +223,8 @@ if [ -z $CAP_PASSWORD ]; then
    CAP_PASSWORD=$(mktemp -u XXXXXXXX)
 fi
 
-echo -e "\nKubeconfig file is stored to: \"$KUBECONFIG\"\n" | tee -a $logfile
+echo -e "\nKubeconfig file is stored to: \"$KUBECONFIG\"" | tee -a $logfile
+echo -e "Run e.g. \"export KUBECONFIG=$PWD/$deploymentid/kubeconfig\" to use it\n"
 
 if [ "$mode" = "manual" ]; then
    internal_ips=($(az network nic list --resource-group $AZ_MC_RG_NAME | jq -r '.[].ipConfigurations[].privateIpAddress'))
@@ -238,12 +239,11 @@ if [ "$mode" = "manual" ]; then
       -e '/^services:/d' \
       -e '/loadbalanced/d' \
       -e 's/capakssc/'$CAP_AKS_STORAGECLASS'/g' > $deploymentid/scf-config-values.yaml
-   echo -e " Public IP:\t\t\t\t${public_ip}\n \
+   echo -e "Values file written to: $deploymentid/scf-config-values.yaml\n\n \
+Public IP:\t\t\t\t${public_ip}\n \
 Private IPs (external_ips for CAP):\t$extip\n \
 Suggested DOMAIN for CAP: \t\t\"$domain\"\n \
-Using storage class: $CAP_AKS_STORAGECLASS \n\n\
-Values file written to: $deploymentid/scf-config-values.yaml \n \
-Run e.g. \"export KUBECONFIG=$PWD/$deploymentid/kubeconfig\" \n\n\
+Using storage class: \"$CAP_AKS_STORAGECLASS\"\n\n\
 You need to:\n \
 Deploy UAA, SCF and Stratos (optionally)\n" | tee -a $logfile
 fi
@@ -257,11 +257,10 @@ if [ "$mode" = "loadbalanced" ]; then
       -e '/private IP/d' \
       -e '/<extip>/d' \
       -e 's/capakssc/'$CAP_AKS_STORAGECLASS'/g' > $deploymentid/scf-config-values.yaml
-   echo -e " Suggested DOMAIN for CAP: \"$domain\"\n \
+   echo -e "Values file written to: $deploymentid/scf-config-values.yaml\n\n \
+Suggested DOMAIN for CAP: \"$domain\"\n \
 Configuration: \"services.loadbalanced=\"true\"\"\n \
-Using storage class: $CAP_AKS_STORAGECLASS \n\n\
-Values file written to: $deploymentid/scf-config-values.yaml \n \
-Run e.g. \"export KUBECONFIG=$PWD/$deploymentid/kubeconfig\" \n\n\
+Using storage class: \"$CAP_AKS_STORAGECLASS\"\n\n\
 You need to:\n \
 1. Deploy UAA\n \
 2. Run \"./dns-setup-uaa.sh -c $conffile\"\n \
