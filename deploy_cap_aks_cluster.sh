@@ -219,7 +219,7 @@ if [ "$mode" = "manual" ]; then
 fi
 
 # Compute random password for CAP and set it if none is given (for scf-config-values.yaml)
-if [ -z $CAP_PASSWORD ]; then
+if [ -z "$CAP_PASSWORD" ]; then
    CAP_PASSWORD=$(mktemp -u XXXXXXXX)
 fi
 
