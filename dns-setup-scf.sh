@@ -33,6 +33,7 @@ if [ -e $conffile ]; then
    export AZ_DNS_SUB_DOMAIN
    export AZ_DNS_RESOURCE_GROUP
    export AZ_DNS_ZONE_NAME
+   export CAP_APP_RUNTIME
   else
    echo -e "Error: Can't find config file: \"$conffile\""
    exit 1
@@ -128,16 +129,22 @@ for service in $(echo $SCF_SERVICES); do
     wait_for_lb $service
 done
 
-clear_ip "ssh.${AZ_DNS_SUB_DOMAIN}"
+if [ "$CAP_APP_RUNTIME" = "diego" ]; then
+   clear_ip "ssh.${AZ_DNS_SUB_DOMAIN}"
+fi
 clear_ip "tcp.${AZ_DNS_SUB_DOMAIN}"
 clear_ip "${AZ_DNS_SUB_DOMAIN}"
 clear_ip "*.${AZ_DNS_SUB_DOMAIN}"
 
-SSH_IP="$(get_lb $SCF_SERVICE_SSH)"
+if [ "$CAP_APP_RUNTIME" = "diego" ]; then
+   SSH_IP="$(get_lb $SCF_SERVICE_SSH)"
+fi
 SCF_IP="$(get_lb $SCF_SERVICE_IP)"
 TCP_IP="$(get_lb $SCF_SERVICE_TCP)"
 
-set_ip "ssh.${AZ_DNS_SUB_DOMAIN}" "${SSH_IP}"
+if [ "$CAP_APP_RUNTIME" = "diego" ]; then
+   set_ip "ssh.${AZ_DNS_SUB_DOMAIN}" "${SSH_IP}"
+fi
 set_ip "tcp.${AZ_DNS_SUB_DOMAIN}" "${TCP_IP}"
 set_ip "${AZ_DNS_SUB_DOMAIN}" "${SCF_IP}"
 set_ip "*.${AZ_DNS_SUB_DOMAIN}" "${SCF_IP}"

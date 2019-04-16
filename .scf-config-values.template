@@ -33,3 +33,6 @@ kube:
 
 services:
   loadbalanced: true
+
+enable:
+  eirini: false

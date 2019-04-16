@@ -44,6 +44,7 @@ if [ -e $conffile ]; then
    export AZ_DNS_ZONE_NAME
    export CAP_PASSWORD
    export CAP_AKS_STORAGECLASS
+   export CAP_APP_RUNTIME
    export AZ_LOAD_BALANCER
    export AZ_CAP_PORTS
   else
@@ -112,37 +113,42 @@ while [[ $node_readiness != "$AZ_AKS_NODE_COUNT True" ]]; do
   )
 done
 
-# Enable swapaccount for each VM
-export AZ_AKS_VMNODES=$(az vm list --resource-group $AZ_MC_RG_NAME -o json | jq -r '.[] | select (.tags.poolName | contains("'$AZ_AKS_NODE_POOL_NAME'")) | .name')
-for i in $AZ_AKS_VMNODES; do
-   az vm run-command invoke -g $AZ_MC_RG_NAME -n $i --command-id RunShellScript --scripts \
-   "sudo sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=)\"(.*.)\"|\1\"\2 swapaccount=1\"|' \
-   /etc/default/grub.d/50-cloudimg-settings.cfg && sudo update-grub" &>> $logfile
-   az vm restart -g $AZ_MC_RG_NAME -n $i &>> $logfile
-   echo -e "Set swapaccount=1 on: $i"
-done
+# Enable swapaccount for each VM (skipped for EIRINI prep)
+if [ "$CAP_APP_RUNTIME" = "diego" ]; then
+   export AZ_AKS_VMNODES=$(az vm list --resource-group $AZ_MC_RG_NAME -o json | jq -r '.[] | select (.tags.poolName | contains("'$AZ_AKS_NODE_POOL_NAME'")) | .name')
 
-# Wait until cluster is back up again
-while [[ $node_readiness != "$AZ_AKS_NODE_COUNT True" ]]; do
-  sleep 5
-  node_readiness=$(
-     kubectl get nodes -o json \
-      | jq -r '.items[] | .status.conditions[] | select(.type == "Ready").status' \
-      | uniq -c | grep -o '\S.*'
-  )
-done
+   for i in $AZ_AKS_VMNODES; do
+      az vm run-command invoke -g $AZ_MC_RG_NAME -n $i --command-id RunShellScript --scripts \
+      "sudo sed -i -r 's|^(GRUB_CMDLINE_LINUX_DEFAULT=)\"(.*.)\"|\1\"\2 swapaccount=1\"|' \
+      /etc/default/grub.d/50-cloudimg-settings.cfg && sudo update-grub" &>> $logfile
+      az vm restart -g $AZ_MC_RG_NAME -n $i &>> $logfile
+      echo -e "Set swapaccount=1 on: $i"
+   done
 
-# Verify swapaccount is enabled on all VMs
-for i in $AZ_AKS_VMNODES; do
-   SWAPACCOUNT=$(az vm run-command invoke -g $AZ_MC_RG_NAME -n $i --command-id RunShellScript --scripts \
-   "sudo cat /proc/cmdline" | grep -o swapaccount)
-   if [ "$SWAPACCOUNT" = "swapaccount" ]; then
-      echo -e "Verified swapaccount enabled on: $i" | tee -a $logfile
-     else
-      echo -e "Error: Swapaccount was not enabled on: $i - aborting" | tee -a $logfile
-      exit 1
-   fi
-done
+   # Wait until cluster is back up again
+   while [[ $node_readiness != "$AZ_AKS_NODE_COUNT True" ]]; do
+     sleep 5
+     node_readiness=$(
+        kubectl get nodes -o json \
+         | jq -r '.items[] | .status.conditions[] | select(.type == "Ready").status' \
+         | uniq -c | grep -o '\S.*'
+     )
+   done
+
+   # Verify swapaccount is enabled on all VMs
+   for i in $AZ_AKS_VMNODES; do
+      SWAPACCOUNT=$(az vm run-command invoke -g $AZ_MC_RG_NAME -n $i --command-id RunShellScript --scripts \
+      "sudo cat /proc/cmdline" | grep -o swapaccount)
+      if [ "$SWAPACCOUNT" = "swapaccount" ]; then
+         echo -e "Verified swapaccount enabled on: $i" | tee -a $logfile
+        else
+         echo -e "Error: Swapaccount was not enabled on: $i - aborting" | tee -a $logfile
+         exit 1
+      fi
+   done
+  else
+   echo -e "Prepared for EIRINI based CAP - Swapaccount was not enabled by intention" | tee -a $logfile
+fi
 
 # Create service account and update tiller
 kubectl create serviceaccount tiller --namespace kube-system &>> $logfile
@@ -267,4 +273,8 @@ You need to:\n \
 3. Deploy SCF\n \
 4. Run \"./dns-setup-scf.sh -c $conffile\"\n \
 5. Optionally continue with Stratos UI, and \"./dns-setup-console.sh -c $conffile\"\n" | tee -a $logfile
+fi
+
+if [ "$CAP_APP_RUNTIME" = "eirini" ]; then
+   sed -i -e 's/eirini: false/eirini: true/g' $deploymentid/scf-config-values.yaml
 fi
