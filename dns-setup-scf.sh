@@ -11,7 +11,7 @@ SCF_NAMESPACE=scf
 SCF_SERVICE_IP=router-gorouter
 SCF_SERVICE_SSH=diego-ssh-ssh-proxy
 SCF_SERVICE_TCP=tcp-router-tcp-router
-SCF_SERVICES="$(echo $SCF_SERVICE_IP $SCF_SERVICE_SSH $SCF_SERVICE_TCP)"
+
 
 usage() {
   echo -e  "\n $0 [-c <config>] Default config is \"$conffile\" \n"
@@ -37,6 +37,12 @@ if [ -e $conffile ]; then
   else
    echo -e "Error: Can't find config file: \"$conffile\""
    exit 1
+fi
+
+if [ "$CAP_APP_RUNTIME" = "diego" ]; then
+   SCF_SERVICES="$(echo $SCF_SERVICE_IP $SCF_SERVICE_SSH $SCF_SERVICE_TCP)"
+  else
+   SCF_SERVICES="$(echo $SCF_SERVICE_IP $SCF_SERVICE_TCP)"
 fi
 
 # Get current records
