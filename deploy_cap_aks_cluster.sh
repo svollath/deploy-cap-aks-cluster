@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#  Tested with Azure AKS (Kubernetes v1.11.8) and CAP-1.3.1 (2.15.2)
-#  * Tools kubectl (1.10.11+), helm (2.8.2+), azure-cli (2.0.60+) are expected, as well as jq.
+#  Tested with Azure AKS (Kubernetes v1.11.9) and CAP-1.4.0 (2.16.4)
+#  * Tools kubectl (1.10.11+), helm (2.8.2+), azure-cli (2.0.65+) are expected, as well as jq.
 #  The script is run on a machine with working az cli, it will use the current directory as working directory.
 #  See https://www.suse.com/documentation/cloud-application-platform-1/book_cap_guides/data/cha_cap_depl-azure.html
 #  Script starts from "Create Resource Group and AKS Instance" on
@@ -88,7 +88,7 @@ echo -e "Created resource group: $AZ_RG_NAME"
 az aks create --resource-group $AZ_RG_NAME --name $AZ_AKS_NAME \
               --node-count $AZ_AKS_NODE_COUNT --admin-username $AZ_ADMIN_USER \
               --ssh-key-value $AZ_SSH_KEY --node-vm-size $AZ_AKS_NODE_VM_SIZE \
-              --node-osdisk-size=60 --nodepool-name $AZ_AKS_NODE_POOL_NAME \
+              --node-osdisk-size=80 --nodepool-name $AZ_AKS_NODE_POOL_NAME \
               --kubernetes-version $AZ_KUBE_VERSION >&1>> $logfile
 
 export AZ_MC_RG_NAME=$(az group list -o table | grep MC_"$AZ_RG_NAME"_ | awk '{print $1}')

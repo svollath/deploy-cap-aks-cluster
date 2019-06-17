@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#  Tested with Azure AKS (Kubernetes v1.11.8) and CAP-1.3.1 (2.15.2)
-#  * Tools kubectl (1.10.11+), helm (2.8.2+), azure-cli (2.0.60+) are expected, as well as jq.
+#  Tested with Azure AKS (Kubernetes v1.11.9) and CAP-1.4.0 (2.16.4)
+#  * Tools kubectl (1.10.11+), helm (2.8.2+), azure-cli (2.0.65+) are expected, as well as jq.
 #  The script is run on a machine with working az cli, it will use the current directory as working directory.
 
 conffile="./example.conf"
