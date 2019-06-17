@@ -15,10 +15,10 @@ The scripts are based on the steps from our official [Documentation](https://www
 Please follow and check the prerequisites there.
 
 Tested with the following versions:
-* CAP Deployment Guide - March 25, 2018
-* CAP 1.3.1 (UAA/SCF 2.15.2, Stratos 2.3.0)
-* Azure AKS (Kubernetes v1.11.8)
-* kubectl (1.10.11+), helm (2.8.2+), azure-cli (2.0.60+) are expected, as well as jq
+* CAP Deployment Guide - June 10, 2019
+* CAP 1.4.0 (UAA/SCF 2.16.4, Stratos 2.4.0)
+* Azure AKS (Kubernetes v1.11.9)
+* kubectl (1.10.11+), helm (2.8.2+), azure-cli (2.0.65+) are expected, as well as jq
 
 
 # Configuration files
@@ -65,7 +65,7 @@ Starting deployment "CAP-AKS-2019-04-10_16h05_test3" with "test3.conf"
 Logfile: CAP-AKS-2019-04-10_16h05_test3/deployment.log
 Created resource group: test3-cap-aks
 Created AKS cluster: test3 in MC_test3-cap-aks_test3_westeurope
-Orchestrator: Kubernetes 1.11.8
+Orchestrator: Kubernetes 1.11.9
 Azure VM type: Standard_DS4v2, Premium Storage: True
 Fetched kubeconfig
 Set swapaccount=1 on: aks-test3-37306405-0
@@ -164,6 +164,15 @@ This script cleans up the DNS records for your configuration, or even delete eve
 
 
 # Notes
+
+## Experimental support for EIRINI
+
+EIRINI is an alterantive application runtime to diego. When set (CAP_APP_RUNTIME=eirini)
+deploy_cap_aks_cluster.sh will also skip enabling "swapaccount" for the AKS nodes. Also DNS related scripts
+rely on the correct CAP_APP_RUNTIME variable.
+If you've prepared an AKS cluster for EIRINI, you can't successfully run SCF with diego on that cluster
+unless you enabled "swapaccount" and adjusted DNS manually.
+Therefore it's recommended to use separated clusters/configs for either "diego" or "eirini".
 
 ## Unsupported "AZ_LOAD_BALANCER=azure" 
 
