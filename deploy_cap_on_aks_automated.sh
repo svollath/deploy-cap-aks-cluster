@@ -114,7 +114,7 @@ do
         PODSTATUS="progress" ;
         while [ $PODSTATUS != "succeeded" ]; do
           sleep 20 ;
-          PODSTATUS=$(cf services|awk '/scf-rails/{print $NF}');
+          PODSTATUS=$(cf services|awk '/scf-rails/{print $(NF-1)}');
           echo "Status $PODSTATUS for db service";
         done
 

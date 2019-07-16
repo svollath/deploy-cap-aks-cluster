@@ -63,7 +63,7 @@ echo -e "Created resource group: $AZ_RG_NAME"
 az aks create --resource-group $AZ_RG_NAME --name $AZ_AKS_NAME \
               --node-count $AZ_AKS_NODE_COUNT --admin-username $AZ_ADMIN_USER \
               --ssh-key-value $AZ_SSH_KEY --node-vm-size $AZ_AKS_NODE_VM_SIZE \
-	      --kubernetes-version 1.12.7 \
+	      --kubernetes-version 1.13.7 \
               --node-osdisk-size=60 --nodepool-name $AZ_AKS_NODE_POOL_NAME 2>&1>> $logfile
 export AZ_CLUSTER_FQDN=$(az aks list -g $AZ_RG_NAME|jq '.[].fqdn'|sed -e 's/"//g')
 echo -e "Cluster FQDN: $AZ_CLUSTER_FQDN"
