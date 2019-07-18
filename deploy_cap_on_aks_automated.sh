@@ -61,7 +61,7 @@ do
         done
        echo "Create Azure SB"
 	export SUBSCRIPTION_ID=$(az account show | jq -r '.id')
-	export REGION=eastus
+	#export REGION=${AZ_REGION}
 	export SBRGNAME=$(tr -dc 'a-zA-Z0-9' < /dev/urandom | head -c 8)-service-broker
 	az group create --name ${SBRGNAME} --location ${REGION}
 	echo SBRGNAME=${SBRGNAME}
@@ -127,6 +127,7 @@ do
 	    git clone https://github.com/scf-samples/rails-example $AKSDEPLOYID/rails-example
 	    cd $AKSDEPLOYID/rails-example
 	    echo "Push the application to SCF"
+	    cf push -c 'rake db:seed' -i 1
 	    cf push
 	    echo "Populate the DB with sample data" 
 	    cf ssh scf-rails-example -c "export PATH=/home/vcap/deps/0/bin:/usr/local/bin:/usr/bin:/bin && \
