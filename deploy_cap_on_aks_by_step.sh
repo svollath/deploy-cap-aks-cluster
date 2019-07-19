@@ -122,6 +122,7 @@ do
 	    git clone https://github.com/scf-samples/rails-example $AKSDEPLOYID/rails-example
 	    cd $AKSDEPLOYID/rails-example
 	    echo "Push the application to SCF"
+            cf push -c 'rake db:seed' -i 1
 	    cf push
 	    echo "Populate the DB with sample data" 
 	    cf ssh scf-rails-example -c "export PATH=/home/vcap/deps/0/bin:/usr/local/bin:/usr/bin:/bin && \
@@ -140,7 +141,7 @@ do
 	    watch kubectl get pods -n stratos
 	    ;;
 	"Deploy Metrics")
-            helm install stratos/metrics --name=scf-metrics --devel --namespace=metrics -f $AKSDEPLOYID/scf-config-values.yaml
+            helm install suse/metrics --name=scf-metrics --namespace=metrics -f $AKSDEPLOYID/scf-config-values.yaml
 	    ;;
 	"Pods Metrics")
 	    watch kubectl get pods -n metrics

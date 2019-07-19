@@ -148,7 +148,7 @@ do
           echo "Til $PODSTATUS pods to wait for in $NS";
         done
 	echo "Deploy Metrics"
-            helm install stratos/metrics --name=scf-metrics --devel --namespace=metrics -f $AKSDEPLOYID/scf-config-values.yaml
+            helm install suse/metrics --name=scf-metrics --devel --namespace=metrics -f $AKSDEPLOYID/scf-config-values.yaml
 	echo "Wait for METRICS pods to be ready"
         PODSTATUS="1" ; NS="metrics" ;
         while [ $PODSTATUS -ne "0" ]; do     
