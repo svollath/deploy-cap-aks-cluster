@@ -5,6 +5,40 @@ if [[ -z "${AKSDEPLOYID}" ]]; then
 else
   [ -f  "$AKSDEPLOYID/.envvar.sh" ]; source $AKSDEPLOYID/.envvar.sh;
 fi
+PS3='Please enter your choice: '
+set -e
+capversions=("1.3.0" "1.3.1" "1.4.0" "1.4.1")
+select ver in "${capversions[@]}"
+do
+    case $ver in
+	"1.3.0")
+	   export UAA_HELM_VERSION=" --version 2.14.5 "
+	   export SCF_HELM_VERSION=" --version 2.14.5 "
+	   export CONSOLE_HELM_VERSION=" --version 2.2.0 "
+	   break;
+	   ;;
+        "1.3.1")
+           export UAA_HELM_VERSION=" --version 2.15.2 "
+           export SCF_HELM_VERSION=" --version 2.15.2 "
+           export CONSOLE_HELM_VERSION=" --version 2.3.0 "
+           break;
+           ;;
+        "1.4.0")
+           export UAA_HELM_VERSION=" --version 2.16.4 "
+           export SCF_HELM_VERSION=" --version 2.16.4 "
+           export CONSOLE_HELM_VERSION=" --version 2.4.0 "
+           break;
+           ;;
+       "1.4.1")
+           export UAA_HELM_VERSION=" --version 2.17.1 "
+           export SCF_HELM_VERSION=" --version 2.17.1 "
+           export CONSOLE_HELM_VERSION=" --version 2.4.0 "
+           break;
+           ;;
+    esac
+done
+echo ">>> Installing CAP version $ver <<<"
+
 kubectl get nodes
 export SUBSCRIPTION_ID=$(az account show | jq -r '.id')
 echo "export SUBSCRIPTION_ID=$SUBSCRIPTION_ID" >> $AKSDEPLOYID/.envvar.sh;
@@ -29,7 +63,7 @@ do
              vim $AKSDEPLOYID/scf-config-values.yaml
 	     ;;
         "Deploy UAA")
-             helm install suse/uaa --name susecf-uaa --namespace uaa --values $AKSDEPLOYID/scf-config-values.yaml
+             helm install suse/uaa $UAA_HELM_VERSION --name susecf-uaa --namespace uaa --values $AKSDEPLOYID/scf-config-values.yaml
             ;;
         "Pods UAA")
  	     watch kubectl get pods -n uaa
@@ -38,7 +72,7 @@ do
 	     SECRET=$(kubectl get pods --namespace uaa -o jsonpath='{.items[?(.metadata.name=="uaa-0")].spec.containers[?(.name=="uaa")].env[?(.name=="INTERNAL_CA_CERT")].valueFrom.secretKeyRef.name}');
 	     CA_CERT="$(kubectl get secret $SECRET --namespace uaa -o jsonpath="{.data['internal-ca-cert']}" | base64 --decode -)";
 	     echo "CA_CERT=$CA_CERT";
-	     helm install suse/cf --name susecf-scf --namespace scf --values $AKSDEPLOYID/scf-config-values.yaml --set "secrets.UAA_CA_CERT=${CA_CERT}"
+	     helm install suse/cf $SCF_HELM_VERSION --name susecf-scf --namespace scf --values $AKSDEPLOYID/scf-config-values.yaml --set "secrets.UAA_CA_CERT=${CA_CERT}"
 	     ;;
         "Pods SCF")
 	     watch kubectl get pods -n scf
@@ -94,9 +128,9 @@ do
 	     cf login -u admin -p $ADMINPSW 
             ;;
         "CF Add SB")
-	cf create-service-broker azure $(kubectl get deployment osba-open-service-broker-azure \
+	cf create-service-broker azure${REGION} $(kubectl get deployment osba-open-service-broker-azure \
 	--namespace osba -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name == "BASIC_AUTH_USERNAME")].value}') $(kubectl get secret --namespace osba osba-open-service-broker-azure -o jsonpath='{.data.basic-auth-password}' | base64 -d) http://osba-open-service-broker-azure.osba
-	cf service-access -b azure | awk '($2 ~ /basic/)||($1 ~ /mongo/) { system("cf enable-service-access " $1 " -p " $2)}'
+	cf service-access -b azure${REGION} | awk '($2 ~ /basic/)||($1 ~ /mongo/) { system("cf enable-service-access " $1 " -p " $2 " -b " brok)}/^broker:/{brok=$2}'
 	    ;;
 	"CF CreateOrgSpace")
 	cf create-org testorg;
@@ -135,7 +169,7 @@ do
 	    cf apps|awk '/xip/{print "curl " $NF }'|sh
 	    ;;
         "Deploy Stratos SCF Console")
-	    helm install suse/console --name susecf-console --namespace stratos --values $AKSDEPLOYID/scf-config-values.yaml --set services.loadbalanced=true --set metrics.enabled=true
+	    helm install suse/console $CONSOLE_HELM_VERSION --name susecf-console --namespace stratos --values $AKSDEPLOYID/scf-config-values.yaml --set services.loadbalanced=true --set metrics.enabled=true
 	    ;;
 	"Pods Stratos")
 	    watch kubectl get pods -n stratos
