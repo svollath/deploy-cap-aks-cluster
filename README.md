@@ -92,9 +92,11 @@ cf api --skip-ssl-validation $CFEP
 source init_aks_env_my1.sh
 ```
 * you may review/edit/modify the `scf-config-values.yaml` file that is generated in the `$AKSDEPLOYID/scf-config-values.yaml` 
+
 > **__The project CAPnMore contains an updated way to make this, compatible with this AKS deployment__**
 > https://github.com/jmlambert78/CAPnMore
 > ** This version supports both AKS and any K8S cluster compatible with CAP.
+
 ** AN UPDATE CHAPTER WILL BE INCLUDED SOON **
 
 OPTION1: Now you may launch the menu driven steps for deploying CAP on the cluster just deployed.
