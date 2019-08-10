@@ -86,7 +86,7 @@ cf api --skip-ssl-validation $CFEP
 * Save your file
 * initialise your ENVVARs by 
 ```bash
-source init_aks_env.sh
+source init_aks_env_my1.sh
 ```
 * you may review/edit/modify the `scf-config-values.yaml` file that is generated in the `$AKSDEPLOYID/scf-config-values.yaml` 
 
