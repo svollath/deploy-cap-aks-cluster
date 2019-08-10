@@ -78,9 +78,12 @@ vim init_aks_env_my1.sh
 ```
 * Edit the `AKSDEPLOYID` value to match your deployment above.
 ```bash
-export AKSDEPLOYID=CAP-AKS-2019-02-28_12h22_jmlcluster5
-export KUBECONFIG="$AKSDEPLOYID/kubeconfig"
-CFEP=$(awk '/Public IP:/{print "https://api." $NF ".xip.io"}' $AKSDEPLOYID/deployment.log)
+export AKSDEPLOYID="$PWD/"CAP-AKS-2019-08-07_20h13_jmlcluster20""  <- ENVVAR pointing toyour config area for this cluster deployment
+export REGION=westeurope                            <- Your azure region where the ServiceBroker will be deployed
+export KUBECONFIG="$AKSDEPLOYID/kubeconfig"         <- This is the result of the AKS cluster creation already
+export CF_HOME="$AKSDEPLOYID/cfconfig"              <- Your Cloudfoundry config will be stored there
+export PS1="\u:\w:$AKSDEPLOYID>\[$(tput sgr0)\]"
+CFEP=$(awk '/Public IP:/{print "https://api." $NF ".xip.io"}' $AKSDEPLOYID/deployment.log) <- Extract the public IP from the deployment
 cf api --skip-ssl-validation $CFEP
 ```
 * Save your file
@@ -89,6 +92,10 @@ cf api --skip-ssl-validation $CFEP
 source init_aks_env_my1.sh
 ```
 * you may review/edit/modify the `scf-config-values.yaml` file that is generated in the `$AKSDEPLOYID/scf-config-values.yaml` 
+> **__The project CAPnMore contains an updated way to make this, compatible with this AKS deployment__**
+> https://github.com/jmlambert78/CAPnMore
+> ** This version supports both AKS and any K8S cluster compatible with CAP.
+** AN UPDATE CHAPTER WILL BE INCLUDED SOON **
 
 OPTION1: Now you may launch the menu driven steps for deploying CAP on the cluster just deployed.
 ```bash
